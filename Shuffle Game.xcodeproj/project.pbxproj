@@ -8,22 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		FED9B82E2BF5EB07005879C8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B82D2BF5EB07005879C8 /* AppDelegate.swift */; };
-		FED9B8302BF5EB07005879C8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B82F2BF5EB07005879C8 /* SceneDelegate.swift */; };
-		FED9B8322BF5EB07005879C8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8312BF5EB07005879C8 /* ViewController.swift */; };
-		FED9B8352BF5EB07005879C8 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = FED9B8342BF5EB07005879C8 /* Base */; };
+		FED9B8322BF5EB07005879C8 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8312BF5EB07005879C8 /* MainMenu.swift */; };
 		FED9B8372BF5EB08005879C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FED9B8362BF5EB08005879C8 /* Assets.xcassets */; };
-		FED9B83A2BF5EB08005879C8 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = FED9B8392BF5EB08005879C8 /* Base */; };
+		FED9B8432BF5EDAB005879C8 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8422BF5EDAB005879C8 /* Players.swift */; };
+		FED9B8462BF5EE9D005879C8 /* SPCodebase in Frameworks */ = {isa = PBXBuildFile; productRef = FED9B8452BF5EE9D005879C8 /* SPCodebase */; };
+		FED9B8492BF5FC46005879C8 /* BaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8482BF5FC46005879C8 /* BaseView.swift */; };
+		FED9B84C2BF5FCA0005879C8 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B84B2BF5FCA0005879C8 /* BaseViewController.swift */; };
+		FED9B8502BF5FE43005879C8 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B84F2BF5FE43005879C8 /* CustomButton.swift */; };
+		FED9B8532BF61640005879C8 /* PlayersNameTextFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8522BF6163F005879C8 /* PlayersNameTextFields.swift */; };
+		FED9B8562BF61690005879C8 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED9B8552BF61690005879C8 /* CustomTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FED9B82A2BF5EB07005879C8 /* Shuffle Game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Shuffle Game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FED9B82D2BF5EB07005879C8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FED9B82F2BF5EB07005879C8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		FED9B8312BF5EB07005879C8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		FED9B8342BF5EB07005879C8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FED9B8312BF5EB07005879C8 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		FED9B8362BF5EB08005879C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		FED9B8392BF5EB08005879C8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FED9B83B2BF5EB08005879C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FED9B8422BF5EDAB005879C8 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
+		FED9B8482BF5FC46005879C8 /* BaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
+		FED9B84B2BF5FCA0005879C8 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		FED9B84F2BF5FE43005879C8 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		FED9B8522BF6163F005879C8 /* PlayersNameTextFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersNameTextFields.swift; sourceTree = "<group>"; };
+		FED9B8552BF61690005879C8 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FED9B8462BF5EE9D005879C8 /* SPCodebase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,15 +64,74 @@
 		FED9B82C2BF5EB07005879C8 /* Shuffle Game */ = {
 			isa = PBXGroup;
 			children = (
+				FED9B8472BF5FC34005879C8 /* ViewControllers */,
+				FED9B8412BF5ED97005879C8 /* Model */,
 				FED9B82D2BF5EB07005879C8 /* AppDelegate.swift */,
-				FED9B82F2BF5EB07005879C8 /* SceneDelegate.swift */,
-				FED9B8312BF5EB07005879C8 /* ViewController.swift */,
-				FED9B8332BF5EB07005879C8 /* Main.storyboard */,
 				FED9B8362BF5EB08005879C8 /* Assets.xcassets */,
-				FED9B8382BF5EB08005879C8 /* LaunchScreen.storyboard */,
 				FED9B83B2BF5EB08005879C8 /* Info.plist */,
 			);
 			path = "Shuffle Game";
+			sourceTree = "<group>";
+		};
+		FED9B8412BF5ED97005879C8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8422BF5EDAB005879C8 /* Players.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		FED9B8472BF5FC34005879C8 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8512BF61625005879C8 /* MainMenu */,
+				FED9B84D2BF5FE25005879C8 /* Shared */,
+				FED9B84A2BF5FC7A005879C8 /* Base */,
+			);
+			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		FED9B84A2BF5FC7A005879C8 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8482BF5FC46005879C8 /* BaseView.swift */,
+				FED9B84B2BF5FCA0005879C8 /* BaseViewController.swift */,
+			);
+			name = Base;
+			sourceTree = "<group>";
+		};
+		FED9B84D2BF5FE25005879C8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8542BF6167E005879C8 /* TextField */,
+				FED9B84E2BF5FE31005879C8 /* Button */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		FED9B84E2BF5FE31005879C8 /* Button */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B84F2BF5FE43005879C8 /* CustomButton.swift */,
+			);
+			name = Button;
+			sourceTree = "<group>";
+		};
+		FED9B8512BF61625005879C8 /* MainMenu */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8312BF5EB07005879C8 /* MainMenu.swift */,
+				FED9B8522BF6163F005879C8 /* PlayersNameTextFields.swift */,
+			);
+			name = MainMenu;
+			sourceTree = "<group>";
+		};
+		FED9B8542BF6167E005879C8 /* TextField */ = {
+			isa = PBXGroup;
+			children = (
+				FED9B8552BF61690005879C8 /* CustomTextField.swift */,
+			);
+			name = TextField;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -83,6 +150,9 @@
 			dependencies = (
 			);
 			name = "Shuffle Game";
+			packageProductDependencies = (
+				FED9B8452BF5EE9D005879C8 /* SPCodebase */,
+			);
 			productName = "Shuffle Game";
 			productReference = FED9B82A2BF5EB07005879C8 /* Shuffle Game.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +181,9 @@
 				Base,
 			);
 			mainGroup = FED9B8212BF5EB06005879C8;
+			packageReferences = (
+				FED9B8442BF5EE9D005879C8 /* XCRemoteSwiftPackageReference "SPCodebase" */,
+			);
 			productRefGroup = FED9B82B2BF5EB07005879C8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -126,8 +199,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FED9B8372BF5EB08005879C8 /* Assets.xcassets in Resources */,
-				FED9B83A2BF5EB08005879C8 /* Base in Resources */,
-				FED9B8352BF5EB07005879C8 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,32 +209,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FED9B8322BF5EB07005879C8 /* ViewController.swift in Sources */,
+				FED9B84C2BF5FCA0005879C8 /* BaseViewController.swift in Sources */,
+				FED9B8322BF5EB07005879C8 /* MainMenu.swift in Sources */,
+				FED9B8532BF61640005879C8 /* PlayersNameTextFields.swift in Sources */,
+				FED9B8502BF5FE43005879C8 /* CustomButton.swift in Sources */,
+				FED9B8562BF61690005879C8 /* CustomTextField.swift in Sources */,
+				FED9B8432BF5EDAB005879C8 /* Players.swift in Sources */,
 				FED9B82E2BF5EB07005879C8 /* AppDelegate.swift in Sources */,
-				FED9B8302BF5EB07005879C8 /* SceneDelegate.swift in Sources */,
+				FED9B8492BF5FC46005879C8 /* BaseView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		FED9B8332BF5EB07005879C8 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FED9B8342BF5EB07005879C8 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		FED9B8382BF5EB08005879C8 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FED9B8392BF5EB08005879C8 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		FED9B83C2BF5EB08005879C8 /* Debug */ = {
@@ -297,7 +354,6 @@
 				INFOPLIST_FILE = "Shuffle Game/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -325,7 +381,6 @@
 				INFOPLIST_FILE = "Shuffle Game/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -363,6 +418,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FED9B8442BF5EE9D005879C8 /* XCRemoteSwiftPackageReference "SPCodebase" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sepehrhm76/SPCodebase.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FED9B8452BF5EE9D005879C8 /* SPCodebase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FED9B8442BF5EE9D005879C8 /* XCRemoteSwiftPackageReference "SPCodebase" */;
+			productName = SPCodebase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FED9B8222BF5EB06005879C8 /* Project object */;
 }

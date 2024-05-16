@@ -1,0 +1,15 @@
+{
+  "originHash" : "d2f98314e4c427f2619780c4300639e354f8c18210b34ef68f4a45ad7be30fed",
+  "pins" : [
+    {
+      "identity" : "spcodebase",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sepehrhm76/SPCodebase.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c54a95c0c8ac477443276bc48e5f48001c2ef134"
+      }
+    }
+  ],
+  "version" : 3
+}
