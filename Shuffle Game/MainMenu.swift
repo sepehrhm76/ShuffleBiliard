@@ -76,6 +76,7 @@ class MainMenu: BaseViewController {
     
     private lazy var startGameButton: CustomButton = {
         let button = CustomButton()
+        button.isEnabled = false
         button.backgroundColor = .systemGreen
         button.setTitle("Start Game", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
@@ -141,7 +142,7 @@ class MainMenu: BaseViewController {
         case 1:
             if playerNamesStack.arrangedSubviews.count < 7 {
                 
-                if playerNamesStack.arrangedSubviews.count == 2 {
+                if playerNamesStack.arrangedSubviews.count == 1 {
                     startGameButton.isEnabled = true
                 }
                 
@@ -194,7 +195,7 @@ extension MainMenu: PlayersNameTextFieldsDelegateProtocol {
         
         addPlayerButton.isEnabled = true
         
-        if playerNamesStack.arrangedSubviews.count == 2 {
+        if playerNamesStack.arrangedSubviews.count == 1 {
             startGameButton.isEnabled = false
         }
     }
