@@ -10,6 +10,12 @@ import SPCodebase
 
 class MainMenu: BaseViewController {
     
+    var colorBalls = [2,3,4,5,6,7]
+    
+    var players: [Player] = []
+    
+    private var redBallCount = 1
+    
     private lazy var stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
@@ -116,9 +122,6 @@ class MainMenu: BaseViewController {
         roundCounter.spSetSize(width: 100.0, height: 50.0)
         
         stackView.addArrangedSubview(playerNamesStack)
-               
-//        stackView.addArrangedSubview(startGameButton)
-//        startGameButton.spSetSize(height: CustomButton.buttonHeight)
         
         view.addSubview(startGameButton)
         startGameButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
@@ -150,17 +153,29 @@ class MainMenu: BaseViewController {
                     addPlayerButton.isEnabled = false
                 }
                 
-                lazy var players = PlayersNameTextFields()
-                players.tag = playerNamesStack.arrangedSubviews.count
+                lazy var textField = PlayersNameTextFields()
+                textField.tag = playerNamesStack.arrangedSubviews.count
                 
-                players.delegate = self
-                playerNamesStack.addArrangedSubview(players)
-                players.spSetSize(height: 50)
-                players.playerNameTextField.tag = playerNamesStack.arrangedSubviews.count
-                players.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
+                textField.delegate = self
+                playerNamesStack.addArrangedSubview(textField)
+                textField.spSetSize(height: 50)
+                textField.playerNameTextField.tag = playerNamesStack.arrangedSubviews.count
+                textField.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
+                
+                guard let playerName = textField.playerNameTextField.text else { return }
+                
+                guard let randomIndex = colorBalls.indices.randomElement() else { return }
+                let randomBall = colorBalls[randomIndex]
+                
+                colorBalls.remove(at: randomIndex)
+                
+                players.append(Player(name: playerName, ball: randomBall, redRemaining: redBallCount, win: 0))
+                
+               
             }
         case 2:
-            print("hi")
+            self.navigationController?.pushViewController(GameViewController(), animated: true)
+            self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         default:
             break
         }
@@ -182,7 +197,7 @@ extension MainMenu: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        //        MainMenu.roundCount = row + 1
+        redBallCount = row + 1
     }
 }
 
