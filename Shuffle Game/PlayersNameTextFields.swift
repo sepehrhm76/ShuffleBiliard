@@ -18,6 +18,7 @@ class PlayersNameTextFields: UIView, UITextFieldDelegate {
     public var itemTapped: (()->())?
     
     public weak var delegate: PlayersNameTextFieldsDelegateProtocol?
+    let kooft = MainMenu()
     
     private lazy var deleteButton: CustomButton = {
         let button = CustomButton()
@@ -34,6 +35,7 @@ class PlayersNameTextFields: UIView, UITextFieldDelegate {
         let textField = CustomTextField()
         textField.rightView = deleteButton
         textField.rightViewMode = .always
+        textField.autocapitalizationType = .words
         return textField
     }()
     

@@ -10,9 +10,10 @@ import SPCodebase
 
 class MainMenu: BaseViewController {
     
-    var colorBalls = [2,3,4,5,6,7]
+    static var players: [Player] = []
+    static var roundToWin = 1
     
-    var players: [Player] = []
+    var colorBalls = [2,3,4,5,6,7]
     
     private var redBallCount = 1
     
@@ -29,7 +30,6 @@ class MainMenu: BaseViewController {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = 20.0
-        view.isLayoutMarginsRelativeArrangement = true
         return view
     }()
     
@@ -44,6 +44,7 @@ class MainMenu: BaseViewController {
         let pickerView = UIPickerView()
         pickerView.delegate = self
         pickerView.dataSource = self
+        pickerView.tag = 1
         return pickerView
     }()
     
@@ -51,6 +52,7 @@ class MainMenu: BaseViewController {
         let pickerView = UIPickerView()
         pickerView.delegate = self
         pickerView.dataSource = self
+        pickerView.tag = 2
         return pickerView
     }()
     
@@ -84,7 +86,7 @@ class MainMenu: BaseViewController {
         let button = CustomButton()
         button.isEnabled = false
         button.backgroundColor = .systemGreen
-        button.setTitle("Start Game", for: .normal)
+        button.setTitle("Assign balls", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.tag = 2
         return button
@@ -92,6 +94,8 @@ class MainMenu: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationController?.navigationBar.isHidden = true
         
         view.addSubview(scrollView)
         scrollView.spAlignEdges(attribute: .all)
@@ -140,6 +144,22 @@ class MainMenu: BaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
+    private func assignColorBall() -> Int {
+        guard let randomIndex = colorBalls.indices.randomElement() else { return 0 }
+        let randomBall = colorBalls[randomIndex]
+        colorBalls.remove(at: randomIndex)
+        return randomBall
+    }
+    
+    private func makePlayers() {
+        for index in 0..<playerNamesStack.arrangedSubviews.count {
+            if let playerComponent = playerNamesStack.arrangedSubviews[index] as? PlayersNameTextFields {
+                let playerName = playerComponent.playerNameTextField.text ?? ""
+                MainMenu.players.append(Player(name: playerName, ball: assignColorBall(), redRemaining: redBallCount, win: 0))
+            }
+        }
+    }
+    
     @objc private func buttonTapped(sender: UIButton) {
         switch sender.tag {
         case 1:
@@ -154,28 +174,17 @@ class MainMenu: BaseViewController {
                 }
                 
                 lazy var textField = PlayersNameTextFields()
-                textField.tag = playerNamesStack.arrangedSubviews.count
-                
                 textField.delegate = self
                 playerNamesStack.addArrangedSubview(textField)
                 textField.spSetSize(height: 50)
-                textField.playerNameTextField.tag = playerNamesStack.arrangedSubviews.count
                 textField.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
-                
-                guard let playerName = textField.playerNameTextField.text else { return }
-                
-                guard let randomIndex = colorBalls.indices.randomElement() else { return }
-                let randomBall = colorBalls[randomIndex]
-                
-                colorBalls.remove(at: randomIndex)
-                
-                players.append(Player(name: playerName, ball: randomBall, redRemaining: redBallCount, win: 0))
-                
-               
             }
         case 2:
-            self.navigationController?.pushViewController(GameViewController(), animated: true)
+            makePlayers()
+            print(MainMenu.roundToWin)
+            self.navigationController?.pushViewController(SelectingCartViewController(), animated: true)
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+            print(MainMenu.players)
         default:
             break
         }
@@ -197,7 +206,14 @@ extension MainMenu: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        redBallCount = row + 1
+        switch pickerView.tag {
+        case 1:
+            redBallCount = row + 1
+        case 2:
+            MainMenu.roundToWin = row + 1
+        default:
+            break
+        }
     }
 }
 

@@ -1,12 +1,11 @@
 //
-//  GameVC.swift
+//  GameViewController.swift
 //  Shuffle Game
 //
-//  Created by Sepehr on 5/16/24.
+//  Created by sepehr hajimohammadi on 5/19/24.
 //
 
 import UIKit
-import SPCodebase
 
 class GameViewController: BaseViewController {
     
