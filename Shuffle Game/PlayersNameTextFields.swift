@@ -12,7 +12,6 @@ protocol PlayersNameTextFieldsDelegateProtocol: NSObjectProtocol {
     func deleteHandler(_ tag: Int)
 }
 
-
 class PlayersNameTextFields: UIView, UITextFieldDelegate {
     
     public var itemTapped: (()->())?

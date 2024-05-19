@@ -12,6 +12,6 @@ struct Player {
     var ball: Int
     var redRemaining: Int
     var win: Int
-    var password: Int?
+    var password: String?
     var isWinner: Bool
 }

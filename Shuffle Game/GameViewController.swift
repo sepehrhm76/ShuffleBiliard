@@ -8,9 +8,10 @@
 import UIKit
 import SPCodebase
 
-class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDataSource {
+class GameViewController: BaseViewController {
     
-    var isSlideInMenuPresented = false
+    private var isSlideInMenuPresented = false
+    
     private var playersDetail = MainMenu.players.shuffled()
     
     private lazy var slideInMenuPadding: CGFloat = self.view.frame.width * 0.50
@@ -54,6 +55,8 @@ class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDa
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(playersDetail)
+        
         navigationController?.navigationBar.isHidden = false
         navigationItem.setLeftBarButton(sideMenuButton, animated: false)
         
@@ -68,7 +71,7 @@ class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDa
         playersTableView.spAlignBottomEdge(targetView: menuView, targetSide: .centerY, constant: 30.0)
         
         menuView.addSubview(exitButton)
-        exitButton.spAlignAllEdgesExceptTop(bottomConstant: -20.0)
+        exitButton.spAlignAllEdgesExceptTop(bottomConstant: -50.0)
         exitButton.spSetSize(height: 30.0)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
@@ -81,30 +84,6 @@ class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDa
         let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
         swipeRightGesture.direction = .right
         containerView.addGestureRecognizer(swipeRightGesture)
-    }
-    
-    @objc private func sideMenuButtonTapped() {
-        toggleSideMenu()
-    }
-    
-    @objc private func handleTapGesture(_ gesture: UITapGestureRecognizer) {
-        if isSlideInMenuPresented {
-            closeSideMenu()
-        }
-    }
-    
-    @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
-        if gesture.direction == .left && isSlideInMenuPresented {
-            closeSideMenu()
-        } else if gesture.direction == .right && !isSlideInMenuPresented {
-            openSideMenu()
-        }
-    }
-    
-    @objc private func buttonTapped(sender: UIButton) {
-        MainMenu.players.removeAll()
-        self.navigationController?.pushViewController(MainMenu(), animated: true)
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
     private func toggleSideMenu() {
@@ -131,7 +110,71 @@ class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDa
         }
     }
     
-    // MARK: - UITableViewDataSource Methods
+    private func showPasswordAlert(for indexPath: IndexPath) {
+        let player = playersDetail[indexPath.row]
+        let alertController = UIAlertController(title: "Enter Password", message: "Please enter the password:", preferredStyle: .alert)
+        
+        alertController.addTextField { textField in
+            textField.placeholder = "Password"
+            textField.isSecureTextEntry = true
+        }
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
+            if let password = alertController.textFields?.first?.text, password == player.password {
+                self.showBallInfoAlert(for: player)
+            } else {
+                self.showErrorMessage(in: alertController)
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func showBallInfoAlert(for player: Player) {
+        let ballAlertController = UIAlertController(title: "\(player.name)'s Ball", message: "Your ball is \(player.ball)", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        ballAlertController.addAction(okAction)
+        present(ballAlertController, animated: true, completion: nil)
+    }
+    
+    private func showErrorMessage(in alertController: UIAlertController) {
+        let errorMessage = NSAttributedString(string: "Password incorrect. Please try again.", attributes: [NSAttributedString.Key.foregroundColor: UIColor.red])
+        alertController.setValue(errorMessage, forKey: "attributedMessage")
+        alertController.textFields?.first?.text = ""
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc private func sideMenuButtonTapped() {
+        toggleSideMenu()
+    }
+    
+    @objc private func handleTapGesture(_ gesture: UITapGestureRecognizer) {
+        if isSlideInMenuPresented {
+            closeSideMenu()
+        }
+    }
+    
+    @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
+        if gesture.direction == .left && isSlideInMenuPresented {
+            closeSideMenu()
+        } else if gesture.direction == .right && !isSlideInMenuPresented {
+            openSideMenu()
+        }
+    }
+    
+    @objc private func buttonTapped(sender: UIButton) {
+        MainMenu.players.removeAll()
+        self.navigationController?.pushViewController(MainMenu(), animated: true)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+}
+
+extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return playersDetail.count
@@ -145,17 +188,16 @@ class GameViewController: BaseViewController, UITableViewDelegate, UITableViewDa
         return cell
     }
     
-    // MARK: - UITableViewDelegate Methods
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Handle cell selection if needed
+        
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let action = UIContextualAction(style: .destructive, title: "Show ball") { (action, view, completionHandler) in
-            
-            
+        let action = UIContextualAction(style: .normal, title: "Show ball") { _, _, completionHandler in
+            self.showPasswordAlert(for: indexPath)
+            completionHandler(true)
         }
+        action.backgroundColor = .systemBlue
         return UISwipeActionsConfiguration(actions: [action])
     }
 }
