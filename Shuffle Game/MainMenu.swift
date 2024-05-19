@@ -87,6 +87,8 @@ class MainMenu: BaseViewController {
         button.isEnabled = false
         button.backgroundColor = .systemGreen
         button.setTitle("Assign balls", for: .normal)
+        button.setTitle("Players can't be less than 2", for: .disabled)
+        button.setTitleColor(.darkGray, for: .disabled)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.tag = 2
         return button
@@ -132,7 +134,7 @@ class MainMenu: BaseViewController {
         startGameButton.spSetSize(height: CustomButton.buttonHeight)
         
         view.addSubview(addPlayerButton)
-        addPlayerButton.spAlignTrailingAndTopEdges(trailingConstant: -20.0, topConstant: 80.0)
+        addPlayerButton.spAlignTrailingAndTopEdges(trailingConstant: -20.0, topConstant: 60.0)
         addPlayerButton.spSetSize(width: 100.0, height: 30.0)
         
         spConfigureGestureRecognizerToDismissKeyboard()
@@ -155,7 +157,7 @@ class MainMenu: BaseViewController {
         for index in 0..<playerNamesStack.arrangedSubviews.count {
             if let playerComponent = playerNamesStack.arrangedSubviews[index] as? PlayersNameTextFields {
                 let playerName = playerComponent.playerNameTextField.text ?? ""
-                MainMenu.players.append(Player(name: playerName, ball: assignColorBall(), redRemaining: redBallCount, win: 0))
+                MainMenu.players.append(Player(name: playerName, ball: assignColorBall(), redRemaining: redBallCount, win: 0, isWinner: false))
             }
         }
     }
@@ -170,21 +172,20 @@ class MainMenu: BaseViewController {
                 }
                 
                 if playerNamesStack.arrangedSubviews.count == 5 {
-                    addPlayerButton.isEnabled = false
+                    addPlayerButton.isHidden = true
                 }
                 
                 lazy var textField = PlayersNameTextFields()
                 textField.delegate = self
                 playerNamesStack.addArrangedSubview(textField)
+                textField.tag = playerNamesStack.arrangedSubviews.count
                 textField.spSetSize(height: 50)
                 textField.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
             }
         case 2:
             makePlayers()
-            print(MainMenu.roundToWin)
             self.navigationController?.pushViewController(SelectingCartViewController(), animated: true)
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-            print(MainMenu.players)
         default:
             break
         }
@@ -224,7 +225,7 @@ extension MainMenu: PlayersNameTextFieldsDelegateProtocol {
         }
         textField.removeFromSuperview()
         
-        addPlayerButton.isEnabled = true
+        addPlayerButton.isHidden = false
         
         if playerNamesStack.arrangedSubviews.count == 1 {
             startGameButton.isEnabled = false

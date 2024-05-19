@@ -10,6 +10,8 @@ import SPCodebase
 
 class SelectingCartViewController: BaseViewController {
     
+    private var passwordTextFieldBottomConstraint: NSLayoutConstraint?
+    
     private var isCartFlipped =  false
     
     private var playersDetail = MainMenu.players
@@ -56,6 +58,15 @@ class SelectingCartViewController: BaseViewController {
         return button
     }()
     
+    lazy var passwordTextField: CustomTextField = {
+        let textField = CustomTextField()
+        textField.isSecureTextEntry = true
+        textField.canShowPassword(canShow: true)
+        textField.placeholder = "Enter password"
+        textField.keyboardType = .numberPad
+        return textField
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -81,7 +92,19 @@ class SelectingCartViewController: BaseViewController {
         nextPlayerButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
         nextPlayerButton.spSetSize(height: CustomButton.buttonHeight)
         
+        view.addSubview(passwordTextField)
+        passwordTextField.spAlignLeadingAndTrailingEdges(leadingConstant: 20.0, trailingConstant: -20.0)
+        passwordTextFieldBottomConstraint = passwordTextField.spAlignBottomEdge(targetView: nextPlayerButton, targetSide: .top, constant: -50.0)
+        passwordTextField.spSetSize(height: CustomTextField.textFieldHeight)
+        
         showPlayerDetail()
+        spConfigureGestureRecognizerToDismissKeyboard()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     private func showPlayerDetail() {
@@ -95,6 +118,10 @@ class SelectingCartViewController: BaseViewController {
         cartName.text = playersDetail.first?.name
         cartBall.text = String(playersDetail.first?.ball ?? 0)
         playersDetail.removeFirst()
+        
+        //        if let index = MainMenu.players.firstIndex(where: { $0.name == "Sepehr" }) {
+        //               MainMenu.players[index].redRemaining = 10
+        //           })
     }
     
     private func openCart() {
@@ -131,5 +158,27 @@ class SelectingCartViewController: BaseViewController {
             showPlayerDetail()
         }
         closeCart()
+    }
+}
+
+extension SelectingCartViewController {
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+              let bottomTextField = passwordTextFieldBottomConstraint,
+              bottomTextField.constant == -50.0 else {
+            return
+        }
+        
+        let keyboardHeight = keyboardSize.height
+        bottomTextField.constant = -(keyboardHeight) - 200.0
+        view.layoutIfNeeded()
+    }
+    
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        if let bottomTextField = passwordTextFieldBottomConstraint {
+            bottomTextField.constant = -50.0
+            view.layoutIfNeeded()
+        }
     }
 }
