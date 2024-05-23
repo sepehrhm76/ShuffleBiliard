@@ -13,6 +13,8 @@ class SelectingCartViewController: BaseViewController {
     private var textTopConstraint: NSLayoutConstraint?
     private var cartCenterXConstraint: NSLayoutConstraint?
     
+    private var timer: Timer?
+    
     private var isCartFlipped =  false
     
     private var playersDetail = MainMenu.players
@@ -51,19 +53,21 @@ class SelectingCartViewController: BaseViewController {
         return label
     }()
     
-    private lazy var nextPlayerButton: CustomButton = {
-        let button = CustomButton()
+    private lazy var nextPlayerButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.backgroundColor = .systemGreen
         button.setTitle("Next", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
     
-    lazy var passwordTextField: CustomTextField = {
-        let textField = CustomTextField()
+    lazy var passwordTextField: SPCustomTextField = {
+        let textField = SPCustomTextField()
         textField.isSecureTextEntry = true
         textField.canShowPassword(canShow: true)
         textField.placeholder = "Enter password"
+        textField.hidePasswordColor = .systemGreen
+        textField.onSelectBorderColor = UIColor.systemGreen.cgColor
         textField.keyboardType = .numberPad
         return textField
     }()
@@ -92,11 +96,11 @@ class SelectingCartViewController: BaseViewController {
         view.addSubview(passwordTextField)
         passwordTextField.spAlignLeadingAndTrailingEdges(leadingConstant: 20.0, trailingConstant: -20.0)
         passwordTextField.spAlignTopEdge(targetView: cartView, targetSide: .bottom, constant: 50.0)
-        passwordTextField.spSetSize(height: CustomTextField.textFieldHeight)
+        passwordTextField.spSetSize(height: SPCustomTextField.textFieldHeight)
         
         view.addSubview(nextPlayerButton)
         nextPlayerButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
-        nextPlayerButton.spSetSize(height: CustomButton.buttonHeight)
+        nextPlayerButton.spSetSize(height: SPCustomButton.buttonHeight)
         
         showPlayerDetail()
         spConfigureGestureRecognizerToDismissKeyboard()
@@ -127,6 +131,7 @@ class SelectingCartViewController: BaseViewController {
             self.cartBall.isHidden = false
         }, completion: nil)
         isCartFlipped = true
+        startTimer(duration: 2.0)
     }
     
     private func closeCart() {
@@ -136,6 +141,19 @@ class SelectingCartViewController: BaseViewController {
             self.cartBall.isHidden = true
         }, completion: nil)
         isCartFlipped = false
+        stopTimer()
+    }
+    
+    private func startTimer(duration: TimeInterval) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { [weak self] _ in
+            self?.closeCart()
+        }
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
     }
     
     @objc private func cartViewTapped() {
@@ -157,7 +175,7 @@ class SelectingCartViewController: BaseViewController {
                 closeCart()
             }
         } else {
-            TopAlert.shared.show(type: .error, message: "Password can't be empty!")
+            SPTopAlert.shared.show(type: .error, message: "Password can't be empty!")
         }
         
         if nextPlayerButton.currentTitle == "Start Game" {

@@ -19,8 +19,8 @@ class PlayersNameTextFields: UIView, UITextFieldDelegate {
     public weak var delegate: PlayersNameTextFieldsDelegateProtocol?
     let kooft = MainMenu()
     
-    private lazy var deleteButton: CustomButton = {
-        let button = CustomButton()
+    private lazy var deleteButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.setImage(UIImage(systemName: "trash"), for: .normal)
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
         button.backgroundColor = .clear
@@ -30,10 +30,11 @@ class PlayersNameTextFields: UIView, UITextFieldDelegate {
         return button
     }()
     
-    lazy var playerNameTextField: CustomTextField = {
-        let textField = CustomTextField()
+    lazy var playerNameTextField: SPCustomTextField = {
+        let textField = SPCustomTextField()
         textField.rightView = deleteButton
         textField.rightViewMode = .always
+        textField.onSelectBorderColor = UIColor.systemGreen.cgColor
         textField.autocapitalizationType = .words
         return textField
     }()

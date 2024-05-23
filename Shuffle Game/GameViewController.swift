@@ -33,10 +33,9 @@ class GameViewController: BaseViewController {
         return view
     }()
     
-    private lazy var exitButton: CustomButton = {
-        let button = CustomButton()
+    private lazy var exitButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.backgroundColor = .red
-        button.layer.cornerRadius = 0.0
         button.setTitle("Exit", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
@@ -55,8 +54,6 @@ class GameViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(playersDetail)
-        
         navigationController?.navigationBar.isHidden = false
         navigationItem.setLeftBarButton(sideMenuButton, animated: false)
         
@@ -71,44 +68,39 @@ class GameViewController: BaseViewController {
         playersTableView.spAlignBottomEdge(targetView: menuView, targetSide: .centerY, constant: 30.0)
         
         menuView.addSubview(exitButton)
-        exitButton.spAlignAllEdgesExceptTop(bottomConstant: -50.0)
+        exitButton.spAlignAllEdgesExceptTop(leadingConstant: 10.0, trailingConstant: -10.0, bottomConstant: -50.0)
         exitButton.spSetSize(height: 30.0)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
         containerView.addGestureRecognizer(tapGesture)
         
-        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
-        swipeLeftGesture.direction = .left
-        containerView.addGestureRecognizer(swipeLeftGesture)
-        
-        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
-        swipeRightGesture.direction = .right
-        containerView.addGestureRecognizer(swipeRightGesture)
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        containerView.addGestureRecognizer(panGesture)
     }
     
     private func toggleSideMenu() {
-        if isSlideInMenuPresented {
-            closeSideMenu()
-        } else {
-            openSideMenu()
+            if isSlideInMenuPresented {
+                closeSideMenu()
+            } else {
+                openSideMenu()
+            }
         }
-    }
     
     private func openSideMenu() {
-        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
-            self.containerView.frame.origin.x = self.containerView.frame.width - self.slideInMenuPadding
-        } completion: { finished in
-            self.isSlideInMenuPresented = true
+            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
+                self.containerView.frame.origin.x = self.slideInMenuPadding
+            } completion: { finished in
+                self.isSlideInMenuPresented = true
+            }
         }
-    }
-    
-    private func closeSideMenu() {
-        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
-            self.containerView.frame.origin.x = 0.0
-        } completion: { finished in
-            self.isSlideInMenuPresented = false
+
+        private func closeSideMenu() {
+            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
+                self.containerView.frame.origin.x = 0.0
+            } completion: { finished in
+                self.isSlideInMenuPresented = false
+            }
         }
-    }
     
     private func showPasswordAlert(for indexPath: IndexPath) {
         let player = playersDetail[indexPath.row]
@@ -159,13 +151,26 @@ class GameViewController: BaseViewController {
         }
     }
     
-    @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
-        if gesture.direction == .left && isSlideInMenuPresented {
-            closeSideMenu()
-        } else if gesture.direction == .right && !isSlideInMenuPresented {
-            openSideMenu()
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+            let translation = gesture.translation(in: view)
+            let velocity = gesture.velocity(in: view)
+
+            switch gesture.state {
+            case .changed:
+                if (containerView.frame.origin.x + translation.x) >= 0 && (containerView.frame.origin.x + translation.x) <= slideInMenuPadding {
+                    containerView.frame.origin.x += translation.x
+                    gesture.setTranslation(.zero, in: view)
+                }
+            case .ended:
+                if velocity.x > 500 || (containerView.frame.origin.x > slideInMenuPadding / 2 && velocity.x > -500) {
+                    openSideMenu()
+                } else {
+                    closeSideMenu()
+                }
+            default:
+                break
+            }
         }
-    }
     
     @objc private func buttonTapped(sender: UIButton) {
         MainMenu.players.removeAll()

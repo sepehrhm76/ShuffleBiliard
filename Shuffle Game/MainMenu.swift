@@ -73,8 +73,8 @@ class MainMenu: BaseViewController {
         return label
     }()
     
-    private lazy var addPlayerButton: CustomButton = {
-        let button = CustomButton()
+    private lazy var addPlayerButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.backgroundColor = .systemGreen
         button.setTitle("Add player", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
@@ -82,8 +82,8 @@ class MainMenu: BaseViewController {
         return button
     }()
     
-    private lazy var startGameButton: CustomButton = {
-        let button = CustomButton()
+    private lazy var startGameButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.isEnabled = false
         button.backgroundColor = .systemGreen
         button.setTitle("Assign balls", for: .normal)
@@ -131,7 +131,7 @@ class MainMenu: BaseViewController {
         
         view.addSubview(startGameButton)
         startGameButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
-        startGameButton.spSetSize(height: CustomButton.buttonHeight)
+        startGameButton.spSetSize(height: SPCustomButton.buttonHeight)
         
         view.addSubview(addPlayerButton)
         addPlayerButton.spAlignTrailingAndTopEdges(trailingConstant: -20.0, topConstant: 60.0)
