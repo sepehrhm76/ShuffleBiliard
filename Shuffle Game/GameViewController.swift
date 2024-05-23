@@ -24,12 +24,7 @@ class GameViewController: BaseViewController {
     private lazy var menuView: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 0.1022628322, green: 0.3703129888, blue: 0.286925137, alpha: 1)
-        return view
-    }()
-    
-    private lazy var containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray6
+        view.isHidden = true
         return view
     }()
     
@@ -54,14 +49,14 @@ class GameViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .systemGray6
+        
         navigationController?.navigationBar.isHidden = false
         navigationItem.setLeftBarButton(sideMenuButton, animated: false)
         
         view.addSubview(menuView)
-        menuView.spAlignEdges(attribute: .all, margin: .init(top: 0.0, left: 0.0, bottom: 0.0, right: -slideInMenuPadding))
-        
-        view.addSubview(containerView)
-        containerView.spAlignEdges(attribute: .all)
+        menuView.spAlignAllEdgesExceptTrailing(leadingConstant: -slideInMenuPadding)
+        menuView.spSetSize(width: slideInMenuPadding)
         
         menuView.addSubview(playersTableView)
         playersTableView.spAlignAllEdgesExceptBottom()
@@ -72,35 +67,36 @@ class GameViewController: BaseViewController {
         exitButton.spSetSize(height: 30.0)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
-        containerView.addGestureRecognizer(tapGesture)
+        view.addGestureRecognizer(tapGesture)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        containerView.addGestureRecognizer(panGesture)
+        view.addGestureRecognizer(panGesture)
     }
     
     private func toggleSideMenu() {
-            if isSlideInMenuPresented {
-                closeSideMenu()
-            } else {
-                openSideMenu()
-            }
+        if isSlideInMenuPresented {
+            closeSideMenu()
+        } else {
+            openSideMenu()
         }
+    }
     
     private func openSideMenu() {
-            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
-                self.containerView.frame.origin.x = self.slideInMenuPadding
-            } completion: { finished in
-                self.isSlideInMenuPresented = true
-            }
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
+            self.menuView.frame.origin.x = 0.0
+            self.menuView.isHidden = false
+        } completion: { finished in
+            self.isSlideInMenuPresented = true
         }
-
-        private func closeSideMenu() {
-            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
-                self.containerView.frame.origin.x = 0.0
-            } completion: { finished in
-                self.isSlideInMenuPresented = false
-            }
+    }
+    
+    private func closeSideMenu() {
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .curveEaseInOut) {
+            self.menuView.frame.origin.x = -self.slideInMenuPadding
+        } completion: { finished in
+            self.isSlideInMenuPresented = false
         }
+    }
     
     private func showPasswordAlert(for indexPath: IndexPath) {
         let player = playersDetail[indexPath.row]
@@ -152,25 +148,27 @@ class GameViewController: BaseViewController {
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
-            let translation = gesture.translation(in: view)
-            let velocity = gesture.velocity(in: view)
+        let translation = gesture.translation(in: view)
+        let velocity = gesture.velocity(in: view)
 
-            switch gesture.state {
-            case .changed:
-                if (containerView.frame.origin.x + translation.x) >= 0 && (containerView.frame.origin.x + translation.x) <= slideInMenuPadding {
-                    containerView.frame.origin.x += translation.x
-                    gesture.setTranslation(.zero, in: view)
-                }
-            case .ended:
-                if velocity.x > 500 || (containerView.frame.origin.x > slideInMenuPadding / 2 && velocity.x > -500) {
-                    openSideMenu()
-                } else {
-                    closeSideMenu()
-                }
-            default:
-                break
+        switch gesture.state {
+        case .changed:
+            let newOriginX = menuView.frame.origin.x + translation.x
+            if newOriginX >= -slideInMenuPadding && newOriginX <= 0 {
+                menuView.isHidden = false
+                menuView.frame.origin.x = newOriginX
+                gesture.setTranslation(.zero, in: view)
             }
+        case .ended:
+            if velocity.x > 500 || (menuView.frame.origin.x > -slideInMenuPadding / 2 && velocity.x > -500) {
+                openSideMenu()
+            } else {
+                closeSideMenu()
+            }
+        default:
+            break
         }
+    }
     
     @objc private func buttonTapped(sender: UIButton) {
         MainMenu.players.removeAll()
@@ -206,5 +204,3 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         return UISwipeActionsConfiguration(actions: [action])
     }
 }
-
-
