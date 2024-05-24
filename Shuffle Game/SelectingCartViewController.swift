@@ -10,8 +10,7 @@ import SPCodebase
 
 class SelectingCartViewController: BaseViewController {
     
-    private var textTopConstraint: NSLayoutConstraint?
-    private var cartCenterXConstraint: NSLayoutConstraint?
+    private var passwordFieldBottomConstraint: NSLayoutConstraint?
     
     private var timer: Timer?
     
@@ -24,6 +23,11 @@ class SelectingCartViewController: BaseViewController {
         label.textColor = .white
         label.font = Typography.b30()
         return label
+    }()
+    
+    private lazy var containerView: UIView = {
+        let view = UIView()
+        return view
     }()
     
     private lazy var cartView: UIView = {
@@ -79,12 +83,16 @@ class SelectingCartViewController: BaseViewController {
         
         view.addSubview(topText)
         topText.spAlignCenterX()
-        textTopConstraint = topText.spAlignTopEdge(constant: 50.0)
-        topText.spSetSize(height: 100.0)
+        topText.spAlignTopEdge(constant: 100.0)
+        topText.spSetSize(height: 30.0)
         
-        view.addSubview(cartView)
-        cartView.spAlignLeadingAndTrailingEdges(leadingConstant: 20.0, trailingConstant: -20.0)
-        cartCenterXConstraint = cartView.spAlignCenterY()
+        view.addSubview(containerView)
+        containerView.spAlignLeadingAndTrailingEdges()
+        containerView.spAlignCenterY()
+        containerView.spSetSize(height: 300.0)
+        
+        containerView.addSubview(cartView)
+        cartView.spAlignAllEdgesExceptBottom(leadingConstant: 20.0, trailingConstant: -20.0)
         cartView.spSetSize(height: 200.0)
         
         cartView.addSubview(cartName)
@@ -93,15 +101,15 @@ class SelectingCartViewController: BaseViewController {
         cartView.addSubview(cartBall)
         cartBall.spAlignCenterXAndCenterYEdges()
         
-        view.addSubview(passwordTextField)
+        containerView.addSubview(passwordTextField)
         passwordTextField.spAlignLeadingAndTrailingEdges(leadingConstant: 20.0, trailingConstant: -20.0)
-        passwordTextField.spAlignTopEdge(targetView: cartView, targetSide: .bottom, constant: 50.0)
+        passwordFieldBottomConstraint = passwordTextField.spAlignBottomEdge()
         passwordTextField.spSetSize(height: SPCustomTextField.textFieldHeight)
         
         view.addSubview(nextPlayerButton)
         nextPlayerButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
         nextPlayerButton.spSetSize(height: SPCustomButton.buttonHeight)
-        
+
         showPlayerDetail()
         spConfigureGestureRecognizerToDismissKeyboard()
     }
@@ -174,15 +182,17 @@ class SelectingCartViewController: BaseViewController {
                 playersDetail.removeFirst()
                 closeCart()
             }
+            
+            if nextPlayerButton.currentTitle == "Start Game" {
+                navigationController?.pushViewController(GameViewController(), animated: true)
+                navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+            } else {
+                showPlayerDetail()
+            }
+            
         } else {
+            passwordTextField.hasError = true
             SPTopAlert.shared.show(type: .error, message: "Password can't be empty!")
-        }
-        
-        if nextPlayerButton.currentTitle == "Start Game" {
-            navigationController?.pushViewController(GameViewController(), animated: true)
-            navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        } else {
-            showPlayerDetail()
         }
     }
 }
@@ -190,23 +200,17 @@ class SelectingCartViewController: BaseViewController {
 extension SelectingCartViewController {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-              let textTop = textTopConstraint,
-              let cartCenterX = cartCenterXConstraint else {
+        guard let passwordFieldBottomConstraint = passwordFieldBottomConstraint else {
             return
         }
         
-        let keyboardHeight = keyboardSize.height
-        textTop.constant = -keyboardHeight
-        cartCenterX.constant = -keyboardHeight
+        passwordFieldBottomConstraint.constant = -40.0
         view.layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
-        if let textTop = textTopConstraint,
-           let cartCenterX = cartCenterXConstraint {
-            textTop.constant = 50.0
-            cartCenterX.constant = 0.0
+        if let passwordFieldBottomConstraint = passwordFieldBottomConstraint {
+            passwordFieldBottomConstraint.constant = 0.0
             view.layoutIfNeeded()
         }
     }
