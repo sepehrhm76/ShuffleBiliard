@@ -70,7 +70,7 @@ class GameViewController: BaseViewController {
         view.addGestureRecognizer(tapGesture)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        view.addGestureRecognizer(panGesture)
+        //        view.addGestureRecognizer(panGesture)
     }
     
     private func toggleSideMenu() {
@@ -150,7 +150,7 @@ class GameViewController: BaseViewController {
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: view)
         let velocity = gesture.velocity(in: view)
-
+        
         switch gesture.state {
         case .changed:
             let newOriginX = menuView.frame.origin.x + translation.x
@@ -192,8 +192,10 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        let player = playersDetail[indexPath.row]
+        print("Selected player: \(player.name), Ball: \(player.ball)")
     }
+     
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .normal, title: "Show ball") { _, _, completionHandler in
