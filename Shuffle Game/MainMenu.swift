@@ -157,9 +157,28 @@ class MainMenu: BaseViewController {
         for index in 0..<playerNamesStack.arrangedSubviews.count {
             if let playerComponent = playerNamesStack.arrangedSubviews[index] as? PlayersNameTextFields {
                 let playerName = playerComponent.playerNameTextField.text ?? ""
-                MainMenu.players.append(Player(name: playerName, ball: assignColorBall(), redRemaining: redBallCount, win: 0, isWinner: false))
+                MainMenu.players.append(
+                    Player(
+                        id: MainMenu.players.count,
+                        name: playerName,
+                        ball: assignColorBall(),
+                        redRemaining: redBallCount,
+                        win: 0,
+                        isWinner: false,
+                        coloredPottedBalls: [],
+                        redPottedBalls: 0,
+                        pitok: 0,
+                        isPlayerTurn: false
+                    )
+                )
             }
         }
+    }
+    
+    static func savePlayerData(player: Player) {
+        guard let playerIndex = MainMenu.players.firstIndex(where: {$0.id == player.id}) else { return }
+        MainMenu.players.remove(at: playerIndex)
+        MainMenu.players.insert(player, at: playerIndex)
     }
     
     @objc private func buttonTapped(sender: UIButton) {
