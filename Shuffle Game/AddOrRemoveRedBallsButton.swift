@@ -16,9 +16,9 @@ class AddOrRemoveRedBallsButton: UIView {
     enum IconNames: String {
         case trash = "trash", minus = "minus", plus = "plus"
     }
-    
-    var quantityCounter = 0
-    var minQuantity = 0
+    var callback: Callback?
+    var quantityCounter: Int?
+    var minQuantity: Int?
     private var redBallPotted = 0
     private var countdownTimer: Timer?
     private var isFirstTimeClicked = true
@@ -132,6 +132,7 @@ class AddOrRemoveRedBallsButton: UIView {
         }, completion: { _ in
             self.isFirstTimeClicked = false
         })
+        callback?()
     }
     
     private func updateAddButtonUiToPlusIcon() {
@@ -146,20 +147,20 @@ class AddOrRemoveRedBallsButton: UIView {
         addButton.backgroundColor = #colorLiteral(red: 0.582917273, green: 0.7549735904, blue: 0.1221931651, alpha: 1)
         addButton.tintColor = .black
         addButton.setImage(UIImage(systemName: ""), for: .normal)
-        addButton.setTitle(String(self.quantityCounter), for: .normal)
+        addButton.setTitle(String(self.quantityCounter!), for: .normal)
         addButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .light)
     }
     
     private func calculateQuantityCount(action: AddOrRemoveButton) {
         switch action {
         case .add:
-            quantityCounter += 1
+            quantityCounter! += 1
             updateButtonUI(action: .add)
         case .remove:
             if quantityCounter == minQuantity {
                 performActionAfterCountdownEnds()
             } else {
-                quantityCounter -= 1
+                quantityCounter! -= 1
             }
             updateButtonUI(action: .remove)
             
@@ -181,12 +182,12 @@ class AddOrRemoveRedBallsButton: UIView {
         if quantityCounter == minQuantity {
             setMinusButtonIconAndAnimateRotation(iconName: IconNames.trash.rawValue)
         } else {
-            if action == .add && quantityCounter > minQuantity {
+            if action == .add && quantityCounter! > minQuantity! {
                 setMinusButtonIconAndAnimateRotation(iconName: IconNames.minus.rawValue)
             }
         }
         
-        quantityLabel.text = String(quantityCounter)
+        quantityLabel.text = String(quantityCounter!)
     }
     
     private func setMinusButtonIconAndAnimateRotation(iconName: String) {

@@ -8,6 +8,8 @@
 import UIKit
 import SPCodebase
 
+typealias Callback = () -> Void
+
 class GameViewController: BaseViewController {
     
     private var currentPlayer: Player?
@@ -270,14 +272,18 @@ class GameViewController: BaseViewController {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         view.addGestureRecognizer(panGesture)
         
+        addRedBallButton.callback = { [weak self] in
+            self?.calculation()
+        }
+        
         updateDropdownMenu()
     }
     
     private func calculation() {
-        if (currentPlayer!.redRemaining - addRedBallButton.quantityCounter) > 0 {
+        if (currentPlayer!.redRemaining - addRedBallButton.quantityCounter!) > 0 {
             dropdownButton.isEnabled = false
-            currentPlayer!.redRemaining -= addRedBallButton.quantityCounter
-        } else if currentPlayer!.redRemaining - addRedBallButton.quantityCounter <= 0 {
+            currentPlayer!.redRemaining -= addRedBallButton.quantityCounter!
+        } else if currentPlayer!.redRemaining - addRedBallButton.quantityCounter! <= 0 {
             currentPlayer!.redRemaining = 0
             dropdownButton.isEnabled = true
         }
@@ -452,7 +458,7 @@ class GameViewController: BaseViewController {
             undoArray.removeAll()
             undoButton.isHidden = true
             dropdownMenu.isHidden = true
-            currentPlayer?.redPottedBalls = addRedBallButton.quantityCounter
+            currentPlayer?.redPottedBalls = addRedBallButton.quantityCounter!
             currentPlayer?.isPlayerTurn = false
             MainMenu.savePlayerData(player: currentPlayer!)
             if MainMenu.players.count > 0 {
