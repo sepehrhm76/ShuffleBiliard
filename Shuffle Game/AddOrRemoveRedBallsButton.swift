@@ -17,8 +17,8 @@ class AddOrRemoveRedBallsButton: UIView {
         case trash = "trash", minus = "minus", plus = "plus"
     }
     
+    var quantityCounter = 0
     private var countdownTimer: Timer?
-    private var quantityCounter = 0
     private var isFirstTimeClicked = true
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
     
@@ -121,7 +121,7 @@ class AddOrRemoveRedBallsButton: UIView {
     private func performActionAfterCountdownEnds() {
         addButton.isEnabled = true
         if quantityCounter != 0 {
-            updateAddButtonUiToquantityCounterTitle()
+            updateAddButtonUiToQuantityCounterTitle()
         }
         UIView.animate(withDuration: 0.2, animations: {
             self.quantityLabel.isHidden = true
@@ -142,7 +142,7 @@ class AddOrRemoveRedBallsButton: UIView {
         addButton.setTitle("", for: .normal)
     }
     
-    private func updateAddButtonUiToquantityCounterTitle() {
+    func updateAddButtonUiToQuantityCounterTitle() {
         addButton.backgroundColor = #colorLiteral(red: 0.582917273, green: 0.7549735904, blue: 0.1221931651, alpha: 1)
         addButton.tintColor = .black
         addButton.setImage(UIImage(systemName: ""), for: .normal)

@@ -277,6 +277,9 @@ class GameViewController: BaseViewController {
         nameLabel.text = "\(player.name)'s Turn"
         redRemainingLabel.text = "\(player.redRemaining)"
         colorBallsPottedLabel.text = "\(player.coloredPottedBalls)"
+        addRedBallButton.quantityCounter = player.redPottedBalls
+        addRedBallButton.updateAddButtonUiToQuantityCounterTitle()
+        print(addRedBallButton.quantityCounter)
     }
     
     private func toggleSideMenu() {
@@ -373,6 +376,7 @@ class GameViewController: BaseViewController {
         if index < colorBalls.count {
             let value = colorBalls[index]
             currentPlayer?.coloredPottedBalls.append(value)
+            MainMenu.savePlayerData(player: currentPlayer!)
             undoButton.isHidden = false
             undoArray.append(value)
             colorBalls.remove(at: index)
@@ -421,14 +425,14 @@ class GameViewController: BaseViewController {
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         case 2:
             showPasswordAlert(for: currentPlayer!)
-            print(MainMenu.players)
         case 3:
             dropdownMenu.isHidden.toggle()
             print(MainMenu.players)
         case 4:
-            var a = undoArray.last
+            let a = undoArray.last
             undoArray.removeLast()
             currentPlayer?.coloredPottedBalls.removeLast()
+            MainMenu.savePlayerData(player: currentPlayer!)
             colorBalls.append(a!)
             if undoArray.isEmpty == true {
                 undoButton.isHidden = true
@@ -436,15 +440,18 @@ class GameViewController: BaseViewController {
             updateDropdownMenu()
             setupPlayersDetailView(player: currentPlayer!)
         case 5:
+            undoArray.removeAll()
+            undoButton.isHidden = true
+            dropdownMenu.isHidden = true
+            currentPlayer?.redPottedBalls = addRedBallButton.quantityCounter
+            currentPlayer?.isPlayerTurn = false
+            MainMenu.savePlayerData(player: currentPlayer!)
             if MainMenu.players.count > 0 {
                 selectedRow = (selectedRow + 1) % MainMenu.players.count
                 let nextIndexPath = IndexPath(row: selectedRow, section: 0)
                 playersTableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
                 tableView(playersTableView, didSelectRowAt: nextIndexPath)
             }
-            undoArray.removeAll()
-            undoButton.isHidden = true
-            dropdownMenu.isHidden = true
         default:
             break
         }
@@ -466,8 +473,9 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        MainMenu.players[indexPath.row].isPlayerTurn = true
         currentPlayer = MainMenu.players[indexPath.row]
+        currentPlayer?.isPlayerTurn = true
+        MainMenu.savePlayerData(player: currentPlayer!)
         setupPlayersDetailView(player: currentPlayer!)
     }
 }
