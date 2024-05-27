@@ -279,7 +279,6 @@ class GameViewController: BaseViewController {
         colorBallsPottedLabel.text = "\(player.coloredPottedBalls)"
         addRedBallButton.quantityCounter = player.redPottedBalls
         addRedBallButton.updateAddButtonUiToQuantityCounterTitle()
-        print(addRedBallButton.quantityCounter)
     }
     
     private func toggleSideMenu() {
@@ -476,6 +475,8 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         currentPlayer = MainMenu.players[indexPath.row]
         currentPlayer?.isPlayerTurn = true
         MainMenu.savePlayerData(player: currentPlayer!)
+        addRedBallButton.minQuantity = currentPlayer!.redPottedBalls
+        addRedBallButton.quantityCounter = addRedBallButton.minQuantity
         setupPlayersDetailView(player: currentPlayer!)
     }
 }

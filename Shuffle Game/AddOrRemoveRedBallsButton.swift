@@ -18,6 +18,8 @@ class AddOrRemoveRedBallsButton: UIView {
     }
     
     var quantityCounter = 0
+    var minQuantity = 0
+    private var redBallPotted = 0
     private var countdownTimer: Timer?
     private var isFirstTimeClicked = true
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
@@ -120,9 +122,7 @@ class AddOrRemoveRedBallsButton: UIView {
     
     private func performActionAfterCountdownEnds() {
         addButton.isEnabled = true
-        if quantityCounter != 0 {
-            updateAddButtonUiToQuantityCounterTitle()
-        }
+        updateAddButtonUiToQuantityCounterTitle()
         UIView.animate(withDuration: 0.2, animations: {
             self.quantityLabel.isHidden = true
             self.removeButton.isHidden = true
@@ -156,9 +156,10 @@ class AddOrRemoveRedBallsButton: UIView {
             quantityCounter += 1
             updateButtonUI(action: .add)
         case .remove:
-            quantityCounter -= 1
-            if quantityCounter == 0 {
+            if quantityCounter == minQuantity {
                 performActionAfterCountdownEnds()
+            } else {
+                quantityCounter -= 1
             }
             updateButtonUI(action: .remove)
             
@@ -177,10 +178,10 @@ class AddOrRemoveRedBallsButton: UIView {
         
         addButton.isEnabled = quantityCounter != 15
         
-        if quantityCounter <= 1 {
+        if quantityCounter == minQuantity {
             setMinusButtonIconAndAnimateRotation(iconName: IconNames.trash.rawValue)
         } else {
-            if action == .add && quantityCounter == 2 {
+            if action == .add && quantityCounter > minQuantity {
                 setMinusButtonIconAndAnimateRotation(iconName: IconNames.minus.rawValue)
             }
         }
