@@ -273,11 +273,21 @@ class GameViewController: BaseViewController {
         updateDropdownMenu()
     }
     
-    private func setupPlayersDetailView(player: Player) {
-        nameLabel.text = "\(player.name)'s Turn"
-        redRemainingLabel.text = "\(player.redRemaining)"
-        colorBallsPottedLabel.text = "\(player.coloredPottedBalls)"
-        addRedBallButton.quantityCounter = player.redPottedBalls
+    private func calculation() {
+        if (currentPlayer!.redRemaining - addRedBallButton.quantityCounter) > 0 {
+            dropdownButton.isEnabled = false
+            currentPlayer!.redRemaining -= addRedBallButton.quantityCounter
+        } else if currentPlayer!.redRemaining - addRedBallButton.quantityCounter <= 0 {
+            currentPlayer!.redRemaining = 0
+            dropdownButton.isEnabled = true
+        }
+    }
+    
+    private func setupPlayersDetailView() {
+        nameLabel.text = "\(currentPlayer!.name)'s Turn"
+        redRemainingLabel.text = "\(currentPlayer!.redRemaining)"
+        colorBallsPottedLabel.text = "\(currentPlayer!.coloredPottedBalls)"
+        addRedBallButton.quantityCounter = currentPlayer!.redPottedBalls
         addRedBallButton.updateAddButtonUiToQuantityCounterTitle()
     }
     
@@ -380,7 +390,7 @@ class GameViewController: BaseViewController {
             undoArray.append(value)
             colorBalls.remove(at: index)
             updateDropdownMenu()
-            setupPlayersDetailView(player: currentPlayer!)
+            setupPlayersDetailView()
         }
     }
     
@@ -437,7 +447,7 @@ class GameViewController: BaseViewController {
                 undoButton.isHidden = true
             }
             updateDropdownMenu()
-            setupPlayersDetailView(player: currentPlayer!)
+            setupPlayersDetailView()
         case 5:
             undoArray.removeAll()
             undoButton.isHidden = true
@@ -477,6 +487,6 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         MainMenu.savePlayerData(player: currentPlayer!)
         addRedBallButton.minQuantity = currentPlayer!.redPottedBalls
         addRedBallButton.quantityCounter = addRedBallButton.minQuantity
-        setupPlayersDetailView(player: currentPlayer!)
+        setupPlayersDetailView()
     }
 }
