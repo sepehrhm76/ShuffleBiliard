@@ -175,10 +175,12 @@ class MainMenu: BaseViewController {
         }
     }
     
-    static func savePlayerData(player: Player) {
-        guard let playerIndex = MainMenu.players.firstIndex(where: {$0.id == player.id}) else { return }
+    @discardableResult
+    static func savePlayerData(player: Player) -> Player? {
+        guard let playerIndex = MainMenu.players.firstIndex(where: {$0.id == player.id}) else { return nil }
         MainMenu.players.remove(at: playerIndex)
         MainMenu.players.insert(player, at: playerIndex)
+        return player
     }
     
     @objc private func buttonTapped(sender: UIButton) {

@@ -8,11 +8,9 @@
 import UIKit
 import SPCodebase
 
-typealias Callback = () -> Void
-
 class GameViewController: BaseViewController {
     
-    private var currentPlayer: Player?
+    var currentPlayer: Player?
     
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
     
@@ -122,6 +120,7 @@ class GameViewController: BaseViewController {
         button.backgroundColor = .systemOrange
         button.tintColor = .white
         button.tag = 3
+        button.isEnabled = false
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
@@ -272,29 +271,54 @@ class GameViewController: BaseViewController {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         view.addGestureRecognizer(panGesture)
         
-        addRedBallButton.callback = { [weak self] in
-            self?.calculation()
-        }
+        addRedBallButton.observable.receive(on: DispatchQueue.main).sink(receiveCompletion: { completion in
+            switch completion {
+            case .finished:
+                debugPrint("Subscription Finished")
+            case .failure(_):
+                break
+            }
+        }, receiveValue: { newValue in
+            switch newValue {
+            case .none:
+                debugPrint("None! -- On Subscribed (As soon as subscription happens in case you wanna do stuff)")
+            case .finished:
+                self.savePlayerData()
+            }
+        }).store(in: &cancellables)
         
         updateDropdownMenu()
     }
     
+    func savePlayerData() {
+        guard var player = currentPlayer else { return }
+        player.redPottedBalls = addRedBallButton.buttonNumbber
+        currentPlayer = MainMenu.savePlayerData(player: player)!
+        setupPlayersDetailView()
+    }
+    
     private func calculation() {
-        if (currentPlayer!.redRemaining - addRedBallButton.quantityCounter!) > 0 {
+        guard var player = currentPlayer else { return }
+        if (player.redRemaining - player.redPottedBalls) > 0 {
             dropdownButton.isEnabled = false
-            currentPlayer!.redRemaining -= addRedBallButton.quantityCounter!
-        } else if currentPlayer!.redRemaining - addRedBallButton.quantityCounter! <= 0 {
-            currentPlayer!.redRemaining = 0
+            player.redRemaining -= player.redPottedBalls
+        } else if player.redRemaining - player.redPottedBalls <= 0 {
+            player.redRemaining = 0
             dropdownButton.isEnabled = true
         }
+        
+        currentPlayer = player
     }
     
     private func setupPlayersDetailView() {
-        nameLabel.text = "\(currentPlayer!.name)'s Turn"
-        redRemainingLabel.text = "\(currentPlayer!.redRemaining)"
-        colorBallsPottedLabel.text = "\(currentPlayer!.coloredPottedBalls)"
-        addRedBallButton.quantityCounter = currentPlayer!.redPottedBalls
-        addRedBallButton.updateAddButtonUiToQuantityCounterTitle()
+        calculation()
+        guard let player = currentPlayer else { return }
+//        addRedBallButton.buttonNumbber = player.redPottedBalls
+        nameLabel.text = "\(player.name)'s Turn"
+        redRemainingLabel.text = "\(player.redRemaining)"
+        colorBallsPottedLabel.text = "\(player.coloredPottedBalls)"
+//        addRedBallButton.quantityCounter = player.redPottedBalls
+        addRedBallButton.updateAddButtonUiToQuantityCounterTitle(value: player.redPottedBalls)
     }
     
     private func toggleSideMenu() {
@@ -391,12 +415,11 @@ class GameViewController: BaseViewController {
         if index < colorBalls.count {
             let value = colorBalls[index]
             currentPlayer?.coloredPottedBalls.append(value)
-            MainMenu.savePlayerData(player: currentPlayer!)
             undoButton.isHidden = false
             undoArray.append(value)
             colorBalls.remove(at: index)
             updateDropdownMenu()
-            setupPlayersDetailView()
+            savePlayerData()
         }
     }
     
@@ -433,34 +456,32 @@ class GameViewController: BaseViewController {
     }
     
     @objc private func buttonTapped(sender: UIButton) {
+        guard let checkedPlayer = currentPlayer else { return }
+        var player = checkedPlayer
         switch sender.tag {
         case 1:
             MainMenu.players.removeAll()
             self.navigationController?.pushViewController(MainMenu(), animated: true)
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         case 2:
-            showPasswordAlert(for: currentPlayer!)
+            showPasswordAlert(for: player)
         case 3:
             dropdownMenu.isHidden.toggle()
-            print(MainMenu.players)
         case 4:
             let a = undoArray.last
             undoArray.removeLast()
-            currentPlayer?.coloredPottedBalls.removeLast()
-            MainMenu.savePlayerData(player: currentPlayer!)
+            currentPlayer!.coloredPottedBalls.removeLast()
             colorBalls.append(a!)
             if undoArray.isEmpty == true {
                 undoButton.isHidden = true
             }
+            savePlayerData()
             updateDropdownMenu()
-            setupPlayersDetailView()
         case 5:
             undoArray.removeAll()
             undoButton.isHidden = true
             dropdownMenu.isHidden = true
-            currentPlayer?.redPottedBalls = addRedBallButton.quantityCounter!
-            currentPlayer?.isPlayerTurn = false
-            MainMenu.savePlayerData(player: currentPlayer!)
+            player.isPlayerTurn = false
             if MainMenu.players.count > 0 {
                 selectedRow = (selectedRow + 1) % MainMenu.players.count
                 let nextIndexPath = IndexPath(row: selectedRow, section: 0)
@@ -489,10 +510,11 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         currentPlayer = MainMenu.players[indexPath.row]
-        currentPlayer?.isPlayerTurn = true
-        MainMenu.savePlayerData(player: currentPlayer!)
-        addRedBallButton.minQuantity = currentPlayer!.redPottedBalls
-        addRedBallButton.quantityCounter = addRedBallButton.minQuantity
-        setupPlayersDetailView()
+        guard let checkedPlayer = currentPlayer else { return }
+        var player = checkedPlayer
+        player.isPlayerTurn = true
+        addRedBallButton.minQuantity = player.redPottedBalls
+//        addRedBallButton.quantityCounter = addRedBallButton.minQuantity
+        savePlayerData()
     }
 }

@@ -7,6 +7,11 @@
 
 import UIKit
 import SPCodebase
+import Combine
+
+enum StateType{
+    case finished, none
+}
 
 class AddOrRemoveRedBallsButton: UIView {
     enum AddOrRemoveButton {
@@ -16,13 +21,14 @@ class AddOrRemoveRedBallsButton: UIView {
     enum IconNames: String {
         case trash = "trash", minus = "minus", plus = "plus"
     }
-    var callback: Callback?
-    var quantityCounter: Int?
-    var minQuantity: Int?
-    private var redBallPotted = 0
+
+    var quantityCounter = 0
+    var minQuantity = 0
+    var buttonNumbber = 0
     private var countdownTimer: Timer?
     private var isFirstTimeClicked = true
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
+    public private(set) var observable: CurrentValueSubject<StateType, Error> = .init(.none)
     
     lazy var buttonsStack: UIStackView = {
         let stack = UIStackView()
@@ -90,17 +96,19 @@ class AddOrRemoveRedBallsButton: UIView {
     private func addButtonTapped(_ sender: UIButton) {
         performActionAfterCountdownStarts()
         
-        if quantityCounter == 0 {
-            isFirstTimeClicked = true
-        }
+        calculateQuantityCount(action: .add)
         
-        if isFirstTimeClicked {
-            calculateQuantityCount(action: .add)
-        } else if quantityCounter != 0 && isFirstTimeClicked == false {
-            isFirstTimeClicked = true
-            updateButtonUI(action: .none)
-            return
-        }
+//        if quantityCounter == 0 {
+//            isFirstTimeClicked = true
+//        }
+//        
+//        if isFirstTimeClicked {
+//            calculateQuantityCount(action: .add)
+//        } else if quantityCounter != 0 && isFirstTimeClicked == false {
+//            isFirstTimeClicked = true
+//            updateButtonUI(action: .none)
+//            return
+//        }
     }
     
     @objc
@@ -122,7 +130,10 @@ class AddOrRemoveRedBallsButton: UIView {
     
     private func performActionAfterCountdownEnds() {
         addButton.isEnabled = true
-        updateAddButtonUiToQuantityCounterTitle()
+        buttonNumbber += quantityCounter
+        quantityCounter = 0
+//        updateAddButtonUiToQuantityCounterTitle()
+        observable.send(.finished)
         UIView.animate(withDuration: 0.2, animations: {
             self.quantityLabel.isHidden = true
             self.removeButton.isHidden = true
@@ -132,7 +143,6 @@ class AddOrRemoveRedBallsButton: UIView {
         }, completion: { _ in
             self.isFirstTimeClicked = false
         })
-        callback?()
     }
     
     private func updateAddButtonUiToPlusIcon() {
@@ -143,27 +153,26 @@ class AddOrRemoveRedBallsButton: UIView {
         addButton.setTitle("", for: .normal)
     }
     
-    func updateAddButtonUiToQuantityCounterTitle() {
+    func updateAddButtonUiToQuantityCounterTitle(value: Int) {
         addButton.backgroundColor = #colorLiteral(red: 0.582917273, green: 0.7549735904, blue: 0.1221931651, alpha: 1)
         addButton.tintColor = .black
         addButton.setImage(UIImage(systemName: ""), for: .normal)
-        addButton.setTitle(String(self.quantityCounter!), for: .normal)
+        addButton.setTitle(String(value), for: .normal)
         addButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .light)
     }
     
     private func calculateQuantityCount(action: AddOrRemoveButton) {
         switch action {
         case .add:
-            quantityCounter! += 1
+            quantityCounter += 1
             updateButtonUI(action: .add)
         case .remove:
             if quantityCounter == minQuantity {
                 performActionAfterCountdownEnds()
             } else {
-                quantityCounter! -= 1
+                quantityCounter -= 1
             }
             updateButtonUI(action: .remove)
-            
         case .none:
             break
         }
@@ -182,12 +191,11 @@ class AddOrRemoveRedBallsButton: UIView {
         if quantityCounter == minQuantity {
             setMinusButtonIconAndAnimateRotation(iconName: IconNames.trash.rawValue)
         } else {
-            if action == .add && quantityCounter! > minQuantity! {
+            if action == .add && quantityCounter > minQuantity {
                 setMinusButtonIconAndAnimateRotation(iconName: IconNames.minus.rawValue)
             }
         }
-        
-        quantityLabel.text = String(quantityCounter!)
+        quantityLabel.text = String(quantityCounter)
     }
     
     private func setMinusButtonIconAndAnimateRotation(iconName: String) {
