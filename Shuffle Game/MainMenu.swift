@@ -101,13 +101,14 @@ class MainMenu: BaseViewController {
         
         view.addSubview(scrollView)
         scrollView.spAlignEdges(attribute: .all)
+        scrollView.spSetSizeConstraintToOtherView(side: .widthAnchor)
         
         scrollView.addSubview(stackView)
         stackView.spSetSizeConstraintToOtherView(side: .widthAnchor)
         stackView.spAlignEdges(attribute: .all, margin: .init(top: 20.0, left: 0.0, bottom: 0.0, right: 0.0))
         
         stackView.addArrangedSubview(counterContainer)
-        counterContainer.spSetSize(height: 100)
+        counterContainer.spSetSize(height: 150)
         
         counterContainer.addSubview(redBallText)
         redBallText.spAlignLeadingEdge()
@@ -120,17 +121,16 @@ class MainMenu: BaseViewController {
         counterContainer.addSubview(redBallCounter)
         redBallCounter.spAlignCenterX(targetView: redBallText, targetSide: .centerX)
         redBallCounter.spAlignBottomEdge()
-        redBallCounter.spSetSize(width: 100.0, height: 50.0)
+        redBallCounter.spSetSize(width: 100.0, height: 100.0)
         
         counterContainer.addSubview(roundCounter)
         roundCounter.spAlignCenterX(targetView: roundText, targetSide: .centerX)
         roundCounter.spAlignBottomEdge()
-        roundCounter.spSetSize(width: 100.0, height: 50.0)
+        roundCounter.spSetSize(width: 100.0, height: 100.0)
         
         stackView.addArrangedSubview(playerNamesStack)
         
-        view.addSubview(startGameButton)
-        startGameButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
+        stackView.addArrangedSubview(startGameButton)
         startGameButton.spSetSize(height: SPCustomButton.buttonHeight)
         
         view.addSubview(addPlayerButton)
@@ -138,6 +138,9 @@ class MainMenu: BaseViewController {
         addPlayerButton.spSetSize(width: 100.0, height: 30.0)
         
         spConfigureGestureRecognizerToDismissKeyboard()
+        
+//        redBallCounter.selectRow(2, inComponent: 0, animated: true)
+//        roundCounter.selectRow(2, inComponent: 0, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {

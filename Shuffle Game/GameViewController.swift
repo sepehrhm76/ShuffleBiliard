@@ -12,11 +12,13 @@ class GameViewController: BaseViewController {
     
     var currentPlayer: Player?
     
-    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
+    private let feedbackGenerator = UINotificationFeedbackGenerator()
     
     private var isSlideInMenuPresented = false
     
     private var selectedRow = 0
+    
+    private var eachTurnpitokCounter = 0
     
     private var colorBalls = [2,3,4,5,6,7]
     
@@ -161,11 +163,54 @@ class GameViewController: BaseViewController {
         return label
     }()
     
+    private lazy var pitokTitleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.text = "Pitoks:"
+        label.font = Typography.b20()
+        return label
+    }()
+    
+    private(set) lazy var addPitokButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.layer.cornerRadius = 10
+        button.backgroundColor = .red
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        button.tintColor = .white
+        button.tag = 5
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var pitokLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.text = "0"
+        label.font = Typography.b24()
+        return label
+    }()
+    
+    private lazy var removePitokButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.layer.cornerRadius = 10
+        button.backgroundColor = .red
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        button.setImage(UIImage(systemName: "minus"), for: .normal)
+        button.tintColor = .white
+        button.tag = 6
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        button.isHidden = true
+        return button
+    }()
+    
     private lazy var endTurnButton: SPCustomButton = {
         let button = SPCustomButton()
         button.backgroundColor = .systemGreen
         button.setTitle("End turn", for: .normal)
-        button.tag = 5
+        button.setTitle("Please wait", for: .disabled)
+        button.setTitleColor(.darkGray, for: .disabled)
+        button.tag = 7
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
@@ -255,6 +300,26 @@ class GameViewController: BaseViewController {
         colorBallsPottedLabel.spAlignBottomEdge(targetView: colorPotsTitleLabel, targetSide: .bottom)
         colorBallsPottedLabel.spSetSize(height: 30.0)
         
+        view.addSubview(pitokTitleLabel)
+        pitokTitleLabel.spAlignLeadingEdge(constant: 20.0)
+        pitokTitleLabel.spAlignTopEdge(targetView: colorPotsTitleLabel, targetSide: .bottom, constant: 40.0)
+        pitokTitleLabel.spSetSize(height: 30.0)
+        
+        view.addSubview(addPitokButton)
+        addPitokButton.spAlignLeadingEdge(targetView: pitokTitleLabel, targetSide: .trailing, constant: 10.0)
+        addPitokButton.spAlignBottomEdge(targetView: pitokTitleLabel, targetSide: .bottom)
+        addPitokButton.spSetSize(width: 35.0, height: 35.0)
+        
+        view.addSubview(pitokLabel)
+        pitokLabel.spAlignLeadingEdge(targetView: addPitokButton, targetSide: .trailing, constant: 15.0)
+        pitokLabel.spAlignBottomEdge(targetView: addPitokButton, targetSide: .bottom)
+        pitokLabel.spSetSize(height: 30.0)
+        
+        view.addSubview(removePitokButton)
+        removePitokButton.spAlignLeadingEdge(targetView: pitokLabel, targetSide: .trailing, constant: 15.0)
+        removePitokButton.spAlignBottomEdge(targetView: pitokLabel, targetSide: .bottom)
+        removePitokButton.spSetSize(width: 35.0, height: 35.0)
+        
         view.addSubview(endTurnButton)
         endTurnButton.spAlignAllEdgesExceptTop(leadingConstant: 20.0, trailingConstant: -20.0, bottomConstant: -50.0)
         endTurnButton.spSetSize(height: SPCustomButton.buttonHeight)
@@ -284,41 +349,49 @@ class GameViewController: BaseViewController {
                 debugPrint("None! -- On Subscribed (As soon as subscription happens in case you wanna do stuff)")
             case .finished:
                 self.savePlayerData()
+                self.addRedBallButton.quantityCounter = 0
+                self.endTurnButton.isEnabled = true
+            case .loading:
+                self.endTurnButton.isEnabled = false
             }
         }).store(in: &cancellables)
         
         updateDropdownMenu()
     }
     
-    func savePlayerData() {
+    private func savePlayerData() {
         guard var player = currentPlayer else { return }
-        player.redPottedBalls = addRedBallButton.buttonNumbber
+        var a = 0
+        a += addRedBallButton.buttonNumbber
+        addRedBallButton.buttonNumbber = 0
+        player.redPottedBalls += a
         currentPlayer = MainMenu.savePlayerData(player: player)!
         setupPlayersDetailView()
     }
     
     private func calculation() {
         guard var player = currentPlayer else { return }
-        if (player.redRemaining - player.redPottedBalls) > 0 {
+        if (player.redRemaining - addRedBallButton.quantityCounter) > 0 {
             dropdownButton.isEnabled = false
-            player.redRemaining -= player.redPottedBalls
-        } else if player.redRemaining - player.redPottedBalls <= 0 {
+            player.redRemaining -= addRedBallButton.quantityCounter
+        } else if player.redRemaining - addRedBallButton.quantityCounter <= 0 {
             player.redRemaining = 0
             dropdownButton.isEnabled = true
         }
-        
         currentPlayer = player
     }
     
     private func setupPlayersDetailView() {
         calculation()
         guard let player = currentPlayer else { return }
-//        addRedBallButton.buttonNumbber = player.redPottedBalls
+        if eachTurnpitokCounter == player.pitok {
+            removePitokButton.isHidden = true
+        }
         nameLabel.text = "\(player.name)'s Turn"
         redRemainingLabel.text = "\(player.redRemaining)"
         colorBallsPottedLabel.text = "\(player.coloredPottedBalls)"
-//        addRedBallButton.quantityCounter = player.redPottedBalls
         addRedBallButton.updateAddButtonUiToQuantityCounterTitle(value: player.redPottedBalls)
+        pitokLabel.text = String(player.pitok)
     }
     
     private func toggleSideMenu() {
@@ -373,6 +446,7 @@ class GameViewController: BaseViewController {
     }
     
     private func showBallInfoAlert(for player: Player) {
+        feedbackGenerator.notificationOccurred(.warning)
         let ballAlertController = UIAlertController(title: "\(player.name)'s Ball", message: "Your ball is \(player.ball)", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         ballAlertController.addAction(okAction)
@@ -384,6 +458,23 @@ class GameViewController: BaseViewController {
         alertController.setValue(errorMessage, forKey: "attributedMessage")
         alertController.textFields?.first?.text = ""
         present(alertController, animated: true, completion: nil)
+    }
+    
+    private func checkIfPlayerWinsOrEqualOrLost(for player: Player) {
+        if player.redRemaining > addRedBallButton.redBallsOnTable {
+            showLostMessage(for: player)
+            dropdownButton.isEnabled = false
+            addPitokButton.isEnabled = false
+            addRedBallButton.addButton.isEnabled = false
+        }
+    }
+    
+    private func showLostMessage(for player: Player) {
+        feedbackGenerator.notificationOccurred(.warning)
+        let ballAlertController = UIAlertController(title: "\(player.name) has lost!", message: "get out \(player.name)", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        ballAlertController.addAction(okAction)
+        present(ballAlertController, animated: true, completion: nil)
     }
     
     private func updateDropdownMenu() {
@@ -411,7 +502,7 @@ class GameViewController: BaseViewController {
     
     @objc private func dropdownItemTapped(_ sender: UIButton) {
         let index = sender.tag
-        feedbackGenerator.impactOccurred()
+        feedbackGenerator.notificationOccurred(.success)
         if index < colorBalls.count {
             let value = colorBalls[index]
             currentPlayer?.coloredPottedBalls.append(value)
@@ -456,8 +547,8 @@ class GameViewController: BaseViewController {
     }
     
     @objc private func buttonTapped(sender: UIButton) {
-        guard let checkedPlayer = currentPlayer else { return }
-        var player = checkedPlayer
+        guard var player = currentPlayer else { return }
+        savePlayerData()
         switch sender.tag {
         case 1:
             MainMenu.players.removeAll()
@@ -478,10 +569,28 @@ class GameViewController: BaseViewController {
             savePlayerData()
             updateDropdownMenu()
         case 5:
+            feedbackGenerator.notificationOccurred(.success)
+            player.pitok += 1
+            player.redRemaining += 1
+            currentPlayer = MainMenu.savePlayerData(player: player)
+            removePitokButton.isHidden = false
+            savePlayerData()
+            print(MainMenu.players)
+        case 6:
+            feedbackGenerator.notificationOccurred(.success)
+            if player.redRemaining > 0 {
+                player.redRemaining -= 1
+            }
+            player.pitok -= 1
+            currentPlayer = MainMenu.savePlayerData(player: player)
+            savePlayerData()
+            print(MainMenu.players)
+        case 7:
             undoArray.removeAll()
             undoButton.isHidden = true
             dropdownMenu.isHidden = true
             player.isPlayerTurn = false
+            savePlayerData()
             if MainMenu.players.count > 0 {
                 selectedRow = (selectedRow + 1) % MainMenu.players.count
                 let nextIndexPath = IndexPath(row: selectedRow, section: 0)
@@ -510,11 +619,13 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         currentPlayer = MainMenu.players[indexPath.row]
-        guard let checkedPlayer = currentPlayer else { return }
-        var player = checkedPlayer
+        guard var player = currentPlayer else { return }
+        addPitokButton.isEnabled = true
+        addRedBallButton.addButton.isEnabled = true
         player.isPlayerTurn = true
-        addRedBallButton.minQuantity = player.redPottedBalls
-//        addRedBallButton.quantityCounter = addRedBallButton.minQuantity
+        eachTurnpitokCounter = player.pitok
+        checkIfPlayerWinsOrEqualOrLost(for: player)
+        MainMenu.savePlayerData(player: player)
         savePlayerData()
     }
 }

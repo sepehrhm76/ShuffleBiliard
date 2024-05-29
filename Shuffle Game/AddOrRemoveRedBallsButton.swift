@@ -10,7 +10,7 @@ import SPCodebase
 import Combine
 
 enum StateType{
-    case finished, none
+    case finished, none, loading
 }
 
 class AddOrRemoveRedBallsButton: UIView {
@@ -21,9 +21,9 @@ class AddOrRemoveRedBallsButton: UIView {
     enum IconNames: String {
         case trash = "trash", minus = "minus", plus = "plus"
     }
-
+    
+    var redBallsOnTable = 15
     var quantityCounter = 0
-    var minQuantity = 0
     var buttonNumbber = 0
     private var countdownTimer: Timer?
     private var isFirstTimeClicked = true
@@ -60,7 +60,7 @@ class AddOrRemoveRedBallsButton: UIView {
         return button
     }()
     
-    private(set) lazy var addButton: UIButton = {
+     lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
         button.layer.cornerRadius = 10
         button.backgroundColor = .white
@@ -117,6 +117,7 @@ class AddOrRemoveRedBallsButton: UIView {
     }
     
     private func performActionAfterCountdownStarts() {
+        observable.send(.loading)
         updateAddButtonUiToPlusIcon()
         UIView.animate(withDuration: 0.2) {
             self.quantityLabel.isHidden = false
@@ -131,8 +132,13 @@ class AddOrRemoveRedBallsButton: UIView {
     private func performActionAfterCountdownEnds() {
         addButton.isEnabled = true
         buttonNumbber += quantityCounter
-        quantityCounter = 0
-//        updateAddButtonUiToQuantityCounterTitle()
+        
+        if redBallsOnTable > 0 {
+            redBallsOnTable -= buttonNumbber
+            if redBallsOnTable <= 0 {
+                addButton.isEnabled = false
+            }
+        }
         observable.send(.finished)
         UIView.animate(withDuration: 0.2, animations: {
             self.quantityLabel.isHidden = true
@@ -167,7 +173,7 @@ class AddOrRemoveRedBallsButton: UIView {
             quantityCounter += 1
             updateButtonUI(action: .add)
         case .remove:
-            if quantityCounter == minQuantity {
+            if quantityCounter == 0 {
                 performActionAfterCountdownEnds()
             } else {
                 quantityCounter -= 1
@@ -181,17 +187,17 @@ class AddOrRemoveRedBallsButton: UIView {
     private func updateButtonUI(action: AddOrRemoveButton) {
         feedbackGenerator.impactOccurred()
         countdownTimer?.invalidate()
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { [weak self] _ in
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 3.5, repeats: false) { [weak self] _ in
             guard let self = self else { return }
             self.performActionAfterCountdownEnds()
         }
         
-        addButton.isEnabled = quantityCounter != 15
+        addButton.isEnabled = quantityCounter != redBallsOnTable
         
-        if quantityCounter == minQuantity {
+        if quantityCounter == 0 {
             setMinusButtonIconAndAnimateRotation(iconName: IconNames.trash.rawValue)
         } else {
-            if action == .add && quantityCounter > minQuantity {
+            if action == .add && quantityCounter > 0 {
                 setMinusButtonIconAndAnimateRotation(iconName: IconNames.minus.rawValue)
             }
         }
