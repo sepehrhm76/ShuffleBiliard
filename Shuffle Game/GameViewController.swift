@@ -486,12 +486,31 @@ class GameViewController: BaseViewController {
     }
     
     private func checkIfPlayerWinsOrEqualOrLost(for player: Player) {
+        if player.redRemaining > redBallsOnTable {
+            showWinsOrEqualOrLostMessage(title: "\(player.name) has lost!", message: "get out \(player.name)")
+            dropdownButton.isEnabled = false
+            addPitokButton.isEnabled = false
+            addredBallButton.isEnabled = false
+        }
         
+        if player.coloredPottedBalls.contains(player.ball) {
+            var message = ""
+            for i in MainMenu.players {
+                message.append("\(i.name) cart was: \(i.ball)\n")
+            }
+            showWinsOrEqualOrLostMessage(title: "\(player.name) has win!", message: message)
+        }
+        
+        for i in MainMenu.players {
+            if !colorBalls.contains(i.ball) {
+                
+            }
+        }
     }
     
-    private func showLostMessage(for player: Player) {
+    private func showWinsOrEqualOrLostMessage(title: String, message: String) {
         feedbackGenerator.notificationOccurred(.warning)
-        let ballAlertController = UIAlertController(title: "\(player.name) has lost!", message: "get out \(player.name)", preferredStyle: .alert)
+        let ballAlertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         ballAlertController.addAction(okAction)
         present(ballAlertController, animated: true, completion: nil)
@@ -531,6 +550,7 @@ class GameViewController: BaseViewController {
             undoColorBallsArray.append(value)
             colorBalls.remove(at: index)
             updateDropdownMenu()
+            checkIfPlayerWinsOrEqualOrLost(for: player)
             savePlayerData(player: player)
         }
     }
@@ -658,6 +678,7 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         eachTurnPitokCounter = player.pitok
         playerRedRemainingKeeper = player.redRemaining
         eachTurnRedBallPottedCounter = 0
+        addPitokButton.isEnabled = true
         checkIfPlayerWinsOrEqualOrLost(for: player)
         savePlayerData(player: player)
     }
