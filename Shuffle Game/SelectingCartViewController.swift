@@ -35,7 +35,7 @@ class SelectingCartViewController: BaseViewController {
         view.backgroundColor = .white
         view.layer.cornerRadius = 10.0
         view.layer.borderWidth = 5.0
-        view.layer.borderColor = UIColor.systemGreen.cgColor
+        view.layer.borderColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cartViewTapped))
         view.addGestureRecognizer(tapGesture)
         view.isUserInteractionEnabled = true
@@ -59,7 +59,7 @@ class SelectingCartViewController: BaseViewController {
     
     private lazy var nextPlayerButton: SPCustomButton = {
         let button = SPCustomButton()
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         button.setTitle("Next", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
@@ -70,8 +70,8 @@ class SelectingCartViewController: BaseViewController {
         textField.isSecureTextEntry = true
         textField.canShowPassword(canShow: true)
         textField.placeholder = "Enter password"
-        textField.hidePasswordColor = .systemGreen
-        textField.onSelectBorderColor = UIColor.systemGreen.cgColor
+        textField.hidePasswordColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
+        textField.onSelectBorderColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         textField.keyboardType = .numberPad
         return textField
     }()

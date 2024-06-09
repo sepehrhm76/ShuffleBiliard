@@ -34,7 +34,7 @@ class PlayersNameTextFields: UIView, UITextFieldDelegate {
         let textField = SPCustomTextField()
         textField.rightView = deleteButton
         textField.rightViewMode = .always
-        textField.onSelectBorderColor = UIColor.systemGreen.cgColor
+        textField.onSelectBorderColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         textField.autocapitalizationType = .words
         return textField
     }()

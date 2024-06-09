@@ -75,7 +75,7 @@ class MainMenu: BaseViewController {
     
     private lazy var addPlayerButton: SPCustomButton = {
         let button = SPCustomButton()
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         button.setTitle("Add player", for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.tag = 1
@@ -85,7 +85,7 @@ class MainMenu: BaseViewController {
     private lazy var startGameButton: SPCustomButton = {
         let button = SPCustomButton()
         button.isEnabled = false
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
         button.setTitle("Assign balls", for: .normal)
         button.setTitle("Players can't be less than 2", for: .disabled)
         button.setTitleColor(.darkGray, for: .disabled)
