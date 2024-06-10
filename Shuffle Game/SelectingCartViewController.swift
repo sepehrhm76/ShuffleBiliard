@@ -71,7 +71,7 @@ class SelectingCartViewController: BaseViewController {
         textField.canShowPassword(canShow: true)
         textField.placeholder = "Enter password"
         textField.hidePasswordColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
-        textField.onSelectBorderColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
+        textField.onSelectBorderColor = UIColor.green.cgColor
         textField.keyboardType = .numberPad
         return textField
     }()

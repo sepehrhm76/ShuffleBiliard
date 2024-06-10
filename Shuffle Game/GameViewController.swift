@@ -28,7 +28,9 @@ class GameViewController: BaseViewController {
     
     private var colorBalls = [2,3,4,5,6,7]
     
-    private var undoColorBallsArray: [Int] = []
+    private var colorPottedBalls: [Int] = []
+    
+    private var undoColorBalls: [Int] = []
     
     private lazy var slideInMenuPadding: CGFloat = self.view.frame.width * 0.50
     
@@ -112,8 +114,8 @@ class GameViewController: BaseViewController {
         return label
     }()
     
-    private(set) lazy var addredBallButton: UIButton = {
-        let button = UIButton(type: .system)
+    private(set) lazy var addredBallButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.layer.cornerRadius = 10
         button.backgroundColor = .white
         button.setImage(UIImage(systemName: "circle.fill"), for: .normal)
@@ -132,8 +134,8 @@ class GameViewController: BaseViewController {
         return label
     }()
     
-    private lazy var removeRedBallButton: UIButton = {
-        let button = UIButton(type: .system)
+    private lazy var removeRedBallButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.layer.cornerRadius = 10
         button.backgroundColor = .white
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
@@ -208,8 +210,8 @@ class GameViewController: BaseViewController {
         return label
     }()
     
-    private(set) lazy var addPitokButton: UIButton = {
-        let button = UIButton(type: .system)
+    private(set) lazy var addPitokButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.layer.cornerRadius = 10
         button.backgroundColor = .red
         button.setImage(UIImage(systemName: "plus"), for: .normal)
@@ -228,8 +230,8 @@ class GameViewController: BaseViewController {
         return label
     }()
     
-    private lazy var removePitokButton: UIButton = {
-        let button = UIButton(type: .system)
+    private lazy var removePitokButton: SPCustomButton = {
+        let button = SPCustomButton()
         button.layer.cornerRadius = 10
         button.backgroundColor = .red
         button.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
@@ -390,7 +392,7 @@ class GameViewController: BaseViewController {
     }
     
     private func setupPlayersDetailView() {
-        guard var player = currentPlayer else { return }
+        guard let player = currentPlayer else { return }
         
         if player.redRemaining == 0 {
             dropdownButton.isEnabled = true
@@ -499,11 +501,20 @@ class GameViewController: BaseViewController {
                 message.append("\(i.name) cart was: \(i.ball)\n")
             }
             showWinsOrEqualOrLostMessage(title: "\(player.name) has win!", message: message)
-        }
-        
-        for i in MainMenu.players {
-            if !colorBalls.contains(i.ball) {
-                
+        } else {
+            var message = ""
+            var playerBalls: [Int] = []
+            
+            for i in MainMenu.players {
+                playerBalls.append(i.ball)
+                message.append("\(i.name) potted: \(i.coloredPottedBalls)\n")
+                message.append("cart was: \(i.ball)\n")
+            }
+            var colorPottedToSet = Set(colorPottedBalls)
+            var playerBallsToSet = Set(playerBalls)
+
+            if playerBallsToSet.isSubset(of: colorPottedToSet) {
+                showWinsOrEqualOrLostMessage(title: "game is Equal!", message: message)
             }
         }
     }
@@ -546,8 +557,9 @@ class GameViewController: BaseViewController {
         if index < colorBalls.count {
             let value = colorBalls[index]
             player.coloredPottedBalls.append(value)
+            colorPottedBalls.append(value)
             undoButton.isHidden = false
-            undoColorBallsArray.append(value)
+            undoColorBalls.append(value)
             colorBalls.remove(at: index)
             updateDropdownMenu()
             checkIfPlayerWinsOrEqualOrLost(for: player)
@@ -617,11 +629,12 @@ class GameViewController: BaseViewController {
         case 5:
             dropdownMenu.isHidden.toggle()
         case 6:
-            let a = undoColorBallsArray.last
-            undoColorBallsArray.removeLast()
+            let a = undoColorBalls.last
+            undoColorBalls.removeLast()
+            colorPottedBalls.removeLast()
             player.coloredPottedBalls.removeLast()
             colorBalls.append(a!)
-            if undoColorBallsArray.isEmpty == true {
+            if undoColorBalls.isEmpty == true {
                 undoButton.isHidden = true
             }
             savePlayerData(player: player)
@@ -640,7 +653,7 @@ class GameViewController: BaseViewController {
             savePlayerData(player: player)
         case 9:
             eachTurnRedBallPottedCounter = 0
-            undoColorBallsArray.removeAll()
+            undoColorBalls.removeAll()
             undoButton.isHidden = true
             dropdownMenu.isHidden = true
             player.isPlayerTurn = false
