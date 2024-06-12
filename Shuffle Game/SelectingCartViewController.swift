@@ -130,8 +130,6 @@ class SelectingCartViewController: BaseViewController {
         topText.text = "\(playersDetail.first?.name ?? "") take phone:"
         cartName.text = playersDetail.first?.name
         cartBall.text = String(playersDetail.first?.ball ?? 0)
-        
-        passwordTextField.text = "1"
     }
     
     private func openCart() {
@@ -186,6 +184,7 @@ class SelectingCartViewController: BaseViewController {
             }
             
             if nextPlayerButton.currentTitle == "Start Game" {
+                MainMenu.players.shuffle()
                 navigationController?.pushViewController(GameViewController(), animated: true)
                 navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             } else {

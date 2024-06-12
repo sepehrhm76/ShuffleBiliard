@@ -254,7 +254,6 @@ class GameViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        MainMenu.players.shuffle()
         view.backgroundColor = .systemGray6
         
         navigationController?.navigationBar.isHidden = false
@@ -382,12 +381,18 @@ class GameViewController: BaseViewController {
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         view.addGestureRecognizer(panGesture)
-        
+    
         updateDropdownMenu()
     }
     
     private func savePlayerData(player: Player) {
         currentPlayer = MainMenu.savePlayerData(player: player)
+        let defaults = UserDefaults.standard
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(MainMenu.players) {
+            defaults.set(encoded, forKey: "players")
+        }
+        
         setupPlayersDetailView()
     }
     
@@ -510,9 +515,9 @@ class GameViewController: BaseViewController {
                 message.append("\(i.name) potted: \(i.coloredPottedBalls)\n")
                 message.append("cart was: \(i.ball)\n")
             }
-            var colorPottedToSet = Set(colorPottedBalls)
-            var playerBallsToSet = Set(playerBalls)
-
+            let colorPottedToSet = Set(colorPottedBalls)
+            let playerBallsToSet = Set(playerBalls)
+            
             if playerBallsToSet.isSubset(of: colorPottedToSet) {
                 showWinsOrEqualOrLostMessage(title: "game is Equal!", message: message)
             }
@@ -599,14 +604,22 @@ class GameViewController: BaseViewController {
         }
     }
     
+    private func exitGame() {
+        UserDefaults.standard.removeObject(forKey: "players")
+        UserDefaults.standard.removeObject(forKey: "selectedRow")
+        UserDefaults.standard.removeObject(forKey: "redBallsOnTable")
+        UserDefaults.standard.removeObject(forKey: "colorBalls")
+        UserDefaults.standard.removeObject(forKey: "colorPottedBalls")
+        navigationController?.pushViewController(MainMenu(), animated: true)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+    
     @objc private func buttonTapped(sender: UIButton) {
         feedbackGenerator.notificationOccurred(.success)
         guard var player = currentPlayer else { return }
         switch sender.tag {
         case 1:
-            MainMenu.players.removeAll()
-            self.navigationController?.pushViewController(MainMenu(), animated: true)
-            self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+            exitGame()
         case 2:
             showPasswordAlert(for: player)
         case 3:
@@ -656,7 +669,6 @@ class GameViewController: BaseViewController {
             undoColorBalls.removeAll()
             undoButton.isHidden = true
             dropdownMenu.isHidden = true
-            player.isPlayerTurn = false
             savePlayerData(player: player)
             if MainMenu.players.count > 0 {
                 selectedRow = (selectedRow + 1) % MainMenu.players.count
@@ -686,8 +698,7 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         currentPlayer = MainMenu.players[indexPath.row]
-        guard var player = currentPlayer else { return }
-        player.isPlayerTurn = true
+        guard let player = currentPlayer else { return }
         eachTurnPitokCounter = player.pitok
         playerRedRemainingKeeper = player.redRemaining
         eachTurnRedBallPottedCounter = 0

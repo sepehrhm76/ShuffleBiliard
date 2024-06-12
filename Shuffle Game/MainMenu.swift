@@ -82,6 +82,18 @@ class MainMenu: BaseViewController {
         return button
     }()
     
+    private lazy var loadGameButton: SPCustomButton = {
+        let button = SPCustomButton()
+        button.isEnabled = false
+        button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
+        button.setTitle("Load game", for: .normal)
+        button.setTitle("There is notthing to load!", for: .disabled)
+        button.setTitleColor(.darkGray, for: .disabled)
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        button.tag = 2
+        return button
+    }()
+    
     private lazy var startGameButton: SPCustomButton = {
         let button = SPCustomButton()
         button.isEnabled = false
@@ -90,7 +102,7 @@ class MainMenu: BaseViewController {
         button.setTitle("Players can't be less than 2", for: .disabled)
         button.setTitleColor(.darkGray, for: .disabled)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        button.tag = 2
+        button.tag = 3
         return button
     }()
     
@@ -130,6 +142,9 @@ class MainMenu: BaseViewController {
         
         stackView.addArrangedSubview(playerNamesStack)
         
+        stackView.addArrangedSubview(loadGameButton)
+        loadGameButton.spSetSize(height: SPCustomButton.buttonHeight)
+        
         stackView.addArrangedSubview(startGameButton)
         startGameButton.spSetSize(height: SPCustomButton.buttonHeight)
         
@@ -139,8 +154,10 @@ class MainMenu: BaseViewController {
         
         spConfigureGestureRecognizerToDismissKeyboard()
         
-//        redBallCounter.selectRow(2, inComponent: 0, animated: true)
-//        roundCounter.selectRow(2, inComponent: 0, animated: true)
+        loadPlayers()
+        
+        //        redBallCounter.selectRow(2, inComponent: 0, animated: true)
+        //        roundCounter.selectRow(2, inComponent: 0, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -157,6 +174,7 @@ class MainMenu: BaseViewController {
     }
     
     private func makePlayers() {
+        MainMenu.players = []
         for index in 0..<playerNamesStack.arrangedSubviews.count {
             if let playerComponent = playerNamesStack.arrangedSubviews[index] as? PlayersNameTextFields {
                 let playerName = playerComponent.playerNameTextField.text ?? ""
@@ -186,6 +204,17 @@ class MainMenu: BaseViewController {
         return player
     }
     
+    func loadPlayers() {
+        if let savedPlayers = UserDefaults.standard.object(forKey: "players") as? Data {
+            if let loadedPlayers = try? JSONDecoder().decode([Player].self, from: savedPlayers) {
+                MainMenu.players = loadedPlayers
+                loadGameButton.isEnabled = true
+            } else {
+                loadGameButton.isEnabled = false
+            }
+        }
+    }
+    
     @objc private func buttonTapped(sender: UIButton) {
         switch sender.tag {
         case 1:
@@ -207,6 +236,9 @@ class MainMenu: BaseViewController {
                 textField.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
             }
         case 2:
+            navigationController?.pushViewController(GameViewController(), animated: true)
+            navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        case 3:
             makePlayers()
             self.navigationController?.pushViewController(SelectingCartViewController(), animated: true)
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false

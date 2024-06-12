@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Player {
+struct Player: Codable {
     var id: Int
     var name: String
     var ball: Int
