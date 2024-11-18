@@ -604,22 +604,13 @@ class GameViewController: BaseViewController {
         }
     }
     
-    private func exitGame() {
-        UserDefaults.standard.removeObject(forKey: "players")
-        UserDefaults.standard.removeObject(forKey: "selectedRow")
-        UserDefaults.standard.removeObject(forKey: "redBallsOnTable")
-        UserDefaults.standard.removeObject(forKey: "colorBalls")
-        UserDefaults.standard.removeObject(forKey: "colorPottedBalls")
-        navigationController?.pushViewController(MainMenu(), animated: true)
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-    }
-    
     @objc private func buttonTapped(sender: UIButton) {
         feedbackGenerator.notificationOccurred(.success)
         guard var player = currentPlayer else { return }
         switch sender.tag {
         case 1:
-            exitGame()
+            navigationController?.pushViewController(MainMenu(), animated: true)
+            navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         case 2:
             showPasswordAlert(for: player)
         case 3:

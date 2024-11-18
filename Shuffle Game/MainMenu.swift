@@ -76,19 +76,18 @@ class MainMenu: BaseViewController {
     private lazy var addPlayerButton: SPCustomButton = {
         let button = SPCustomButton()
         button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
-        button.setTitle("Add player", for: .normal)
+        button.tintColor = .white
+        button.setImage(.init(systemName: "person.fill.badge.plus"), for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.tag = 1
         return button
     }()
     
-    private lazy var loadGameButton: SPCustomButton = {
+    private lazy var loadRecentPlayersButton: SPCustomButton = {
         let button = SPCustomButton()
-        button.isEnabled = false
         button.backgroundColor = #colorLiteral(red: 0.1098328278, green: 0.4609313361, blue: 0.1896262395, alpha: 1)
-        button.setTitle("Load game", for: .normal)
-        button.setTitle("There is notthing to load!", for: .disabled)
-        button.setTitleColor(.darkGray, for: .disabled)
+        button.tintColor = .white
+        button.setImage(.init(systemName: "externaldrive.fill.badge.person.crop"), for: .normal)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.tag = 2
         return button
@@ -142,22 +141,24 @@ class MainMenu: BaseViewController {
         
         stackView.addArrangedSubview(playerNamesStack)
         
-        stackView.addArrangedSubview(loadGameButton)
-        loadGameButton.spSetSize(height: SPCustomButton.buttonHeight)
-        
         stackView.addArrangedSubview(startGameButton)
         startGameButton.spSetSize(height: SPCustomButton.buttonHeight)
         
         view.addSubview(addPlayerButton)
         addPlayerButton.spAlignTrailingAndTopEdges(trailingConstant: -20.0, topConstant: 60.0)
-        addPlayerButton.spSetSize(width: 100.0, height: 30.0)
+        addPlayerButton.spSetSize(width: SPCustomButton.buttonHeight, height: SPCustomButton.buttonHeight)
+        
+        view.addSubview(loadRecentPlayersButton)
+        loadRecentPlayersButton.spAlignTopEdge(targetView: addPlayerButton, targetSide: .top)
+        loadRecentPlayersButton.spAlignTrailingEdge(targetView: addPlayerButton, targetSide: .leading, constant: -10.0)
+        loadRecentPlayersButton.spSetSize(width: SPCustomButton.buttonHeight, height: SPCustomButton.buttonHeight)
+        
+        loadRecentPlayers()
+        
+        redBallCounter.selectRow(2, inComponent: 0, animated: true)
+        roundCounter.selectRow(2, inComponent: 0, animated: true)
         
         spConfigureGestureRecognizerToDismissKeyboard()
-        
-        loadPlayers()
-        
-        //        redBallCounter.selectRow(2, inComponent: 0, animated: true)
-        //        roundCounter.selectRow(2, inComponent: 0, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -196,23 +197,38 @@ class MainMenu: BaseViewController {
         }
     }
     
+    private func saveRecentPlayers() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(MainMenu.players) {
+            UserDefaults.standard.set(encoded, forKey: "playersKey")
+        }
+    }
+    
+    private func loadRecentPlayers() {
+        if let savedPlayersData = UserDefaults.standard.data(forKey: "playersKey") {
+            let decoder = JSONDecoder()
+            if let loadedPlayers = try? decoder.decode([Player].self, from: savedPlayersData) {
+                MainMenu.players = loadedPlayers
+                loadRecentPlayersButton.isHidden = MainMenu.players.isEmpty
+            }
+        }
+    }
+    
+    private func makePlayersTextField(name: String? = nil) {
+        lazy var textField = PlayersNameTextFields()
+        textField.delegate = self
+        playerNamesStack.addArrangedSubview(textField)
+        textField.tag = playerNamesStack.arrangedSubviews.count
+        textField.spSetSize(height: 50)
+        textField.playerNameTextField.text = name ?? "Player \(playerNamesStack.arrangedSubviews.count)"
+    }
+    
     @discardableResult
     static func savePlayerData(player: Player) -> Player? {
         guard let playerIndex = MainMenu.players.firstIndex(where: {$0.id == player.id}) else { return nil }
         MainMenu.players.remove(at: playerIndex)
         MainMenu.players.insert(player, at: playerIndex)
         return player
-    }
-    
-    func loadPlayers() {
-        if let savedPlayers = UserDefaults.standard.object(forKey: "players") as? Data {
-            if let loadedPlayers = try? JSONDecoder().decode([Player].self, from: savedPlayers) {
-                MainMenu.players = loadedPlayers
-                loadGameButton.isEnabled = true
-            } else {
-                loadGameButton.isEnabled = false
-            }
-        }
     }
     
     @objc private func buttonTapped(sender: UIButton) {
@@ -228,18 +244,18 @@ class MainMenu: BaseViewController {
                     addPlayerButton.isHidden = true
                 }
                 
-                lazy var textField = PlayersNameTextFields()
-                textField.delegate = self
-                playerNamesStack.addArrangedSubview(textField)
-                textField.tag = playerNamesStack.arrangedSubviews.count
-                textField.spSetSize(height: 50)
-                textField.playerNameTextField.text = "Player \(playerNamesStack.arrangedSubviews.count)"
+                makePlayersTextField()
             }
         case 2:
-            navigationController?.pushViewController(GameViewController(), animated: true)
-            navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+            for i in MainMenu.players {
+                makePlayersTextField(name: i.name)
+            }
+            startGameButton.isEnabled = true
+            loadRecentPlayersButton.isHidden = true
+            addPlayerButton.isHidden = playerNamesStack.arrangedSubviews.count == 6
         case 3:
             makePlayers()
+            saveRecentPlayers()
             self.navigationController?.pushViewController(SelectingCartViewController(), animated: true)
             self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         default:
